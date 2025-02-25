@@ -20,7 +20,9 @@ class _SignInOKPageState extends State<SignInOKPage> {
         padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [const Text("Пока нельзя ;(")],
+          children: [
+            const Text("Вход через ОК не реализован >_<"),
+          ],
         ),
       ),
     );
@@ -30,7 +32,7 @@ class _SignInOKPageState extends State<SignInOKPage> {
     return AppBar(
       title: const Text(
         "Войти через ОК",
-        style: LoginAndSignUpFontStyles.header,
+        style: AuthTextStyles.header,
       ),
     );
   }

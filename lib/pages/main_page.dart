@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:maps_application/widgets/suggestion_point_panel.dart';
 
 int myId = 0;
 
@@ -58,6 +59,7 @@ class _MainPageState extends State<MainPage> {
 
     _currentLocation = LatLng(position.latitude, position.longitude);
     _userCurrentLocation();
+    setState(() {});
   }
 
   @override
@@ -75,105 +77,6 @@ class _MainPageState extends State<MainPage> {
       coords: latLng,
     );
     setState(() {});
-  }
-
-  Widget openPanel(Suggestion suggestion) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
-
-    nameController.text = suggestion.name;
-    descriptionController.text = suggestion.description;
-
-    return Stack(
-      children: [
-        GestureDetector(
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Color.fromRGBO(0, 0, 0, 0.5),
-          ),
-          onPanUpdate: (_) {},
-          onTap: () {
-            setState(() {
-              isOpened = false;
-              tempSuggestion = null;
-            });
-          },
-        ),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 60),
-            child: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        hintText: "Название",
-                        border: OutlineInputBorder(),
-                      ),
-                      enabled: suggestion.author_id == myId,
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: descriptionController,
-                      decoration: InputDecoration(
-                        hintText: "Описание",
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 10,
-                      enabled: suggestion.author_id == myId,
-                    ),
-                    Row(
-                      children: [
-                        if (suggestion.author_id == myId)
-                          TextButton(
-                            onPressed: () {
-                              if (isHaveId(suggestion.id)) {
-                                editSuggestion(
-                                  suggestion.id,
-                                  name: nameController.text,
-                                  description: descriptionController.text,
-                                );
-                              } else {
-                                addSuggestion(Suggestion(
-                                  name: nameController.text,
-                                  description: descriptionController.text,
-                                  author_id: myId,
-                                  coords: suggestion.coords,
-                                  category: suggestion.category,
-                                ));
-                              }
-                              setState(() {
-                                isOpened = false;
-                                tempSuggestion = null;
-                              });
-                            },
-                            child: Text('Сохранить'),
-                          ),
-                        SizedBox(width: 20),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              isOpened = false;
-                              tempSuggestion = null;
-                            });
-                          },
-                          child: Text('Отмема'),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
   }
 
   @override
@@ -201,7 +104,6 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("Карта")),
       body: Stack(
         children: [
           FlutterMap(
@@ -234,18 +136,31 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-          if (isOpened) openPanel(tempSuggestion!)
+          if (isOpened)
+            SuggestionPointPanel(
+              suggestion: tempSuggestion!,
+              isEnable: tempSuggestion!.author_id == myId,
+              onClose: () {
+                setState(
+                  () {
+                    isOpened = false;
+                    tempSuggestion = null;
+                  },
+                );
+              },
+            ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _userCurrentLocation,
-        backgroundColor: Colors.blue,
-        child: Icon(
-          Icons.my_location,
-          color: Colors.white,
-          size: 32,
-        ),
-      ),
+      floatingActionButton: (!isOpened && _currentLocation != null)
+          ? FloatingActionButton(
+              onPressed: _userCurrentLocation,
+              backgroundColor: Colors.blue,
+              child: Icon(
+                Icons.my_location,
+                color: Colors.white,
+                size: 32,
+              ))
+          : null,
     );
   }
 }

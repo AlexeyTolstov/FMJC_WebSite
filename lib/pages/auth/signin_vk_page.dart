@@ -20,7 +20,9 @@ class _SignInVKPageState extends State<SignInVKPage> {
         padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [const Text("Пока нельзя ;(")],
+          children: [
+            const Text("Вход через ВК не реализован >_<"),
+          ],
         ),
       ),
     );
@@ -30,7 +32,7 @@ class _SignInVKPageState extends State<SignInVKPage> {
     return AppBar(
       title: const Text(
         "Войти через ВК",
-        style: LoginAndSignUpFontStyles.header,
+        style: AuthTextStyles.header,
       ),
     );
   }

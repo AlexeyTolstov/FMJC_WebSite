@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
 
-abstract class LoginColors {
+abstract class AuthColors {
   static const Color headerColor = Colors.black;
   static const Color textColor = Colors.black;
   static const Color hintTextColor = Colors.black;
 
-  // Login button
-  static const Color loginButtonBackgroundColor = Colors.red;
-  static const Color loginButtonForegroundColor = Colors.white;
+  static const Color mainButtonBackgroundColor = Color(0xFF4770a0);
+  static const Color mainButtonForegroundColor = Colors.white;
 
-  // SignUp button
-  static const Color signUpButtonBackgroundColor = Colors.white;
-  static const Color signUpButtonForegroundColor = Colors.red;
+  static const Color secondaryButtonBackgroundColor = Colors.white;
+  static const Color secondaryButtonForegroundColor = Color(0xFF4770a0);
 }
 
+abstract class AppColors {
+  static const Color saveButtonColorBackground = Colors.orangeAccent;
+  static const Color saveButtonColorForeground = Colors.white;
 
-abstract class SignUpColors {
-  static const Color headerColor = Colors.black;
-  static const Color textColor = Colors.black;
-  static const Color hintTextColor = Colors.black;
-
-  // SignUp button
-  static const Color signUpButtonBackgroundColor = Colors.red;
-  static const Color signUpButtonForegroundColor = Colors.white;
-
-  // Login button
-  static const Color loginButtonBackgroundColor = Colors.white;
-  static const Color loginButtonForegroundColor = Colors.red;
+  static const Color cancelButtonColorBackground = Colors.white;
+  static const Color cancelButtonColorForeground = Colors.orangeAccent;
 }

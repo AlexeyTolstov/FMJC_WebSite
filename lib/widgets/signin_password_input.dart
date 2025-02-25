@@ -24,7 +24,7 @@ class _InputLoginPasswordState extends State<InputLoginPassword> {
         TextField(
           controller: widget.loginTextController,
           decoration: const InputDecoration(
-            hintText: "Логин",
+            hintText: "Логин, e-mail или телефон",
             border: OutlineInputBorder(),
           ),
         ),

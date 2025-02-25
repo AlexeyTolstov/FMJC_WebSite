@@ -20,7 +20,9 @@ class _SignInGosuslugiPageState extends State<SignInGosuslugiPage> {
         padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [const Text("Пока нельзя ;(")],
+          children: [
+            const Text("Вход через ГосУслуги еще не реализован >_<"),
+          ],
         ),
       ),
     );
@@ -30,7 +32,7 @@ class _SignInGosuslugiPageState extends State<SignInGosuslugiPage> {
     return AppBar(
       title: const Text(
         "Войти через Госуслуги",
-        style: LoginAndSignUpFontStyles.header,
+        style: AuthTextStyles.header,
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maps_application/styles/button_styles.dart';
 import 'package:maps_application/styles/font_styles.dart';
+import 'package:maps_application/styles/images.dart';
 import 'package:maps_application/widgets/auth/gosuslugi_button.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/widgets/auth/ok_button.dart';
@@ -21,103 +22,127 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SignInAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Форма входа (login / password)
-            Center(
-              child: SizedBox(
-                width: 300,
-                child: InputLoginPassword(
-                  loginTextController: loginTextController,
-                  passwordTextController: passwordTextController,
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: ApplicationImages.BackgroundImage,
+                fit: BoxFit.cover,
               ),
             ),
+          ),
+          Center(
+            child: IntrinsicWidth(
+              child: IntrinsicHeight(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 30,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Войти',
+                          style: AuthTextStyles.header,
+                        ),
 
-            const SizedBox(height: 30),
+                        SizedBox(height: 20),
 
-            /// Кнопка входа
-            Center(
-              child: TextButton(
-                // onPressed: () {},
-                onPressed: signInValidation,
-                style: AuthButtonsStyles.mainButton,
-                child: const SizedBox(
-                  width: 300,
-                  child: Text(
-                    "Войти",
-                    textAlign: TextAlign.center,
-                    style: LoginAndSignUpFontStyles.buttonText,
+                        /// Форма входа (login / password)
+
+                        InputLoginPassword(
+                          loginTextController: loginTextController,
+                          passwordTextController: passwordTextController,
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        /// Кнопка входа
+
+                        Center(
+                          child: TextButton(
+                            onPressed: signInValidation,
+                            style: AuthButtonsStyles.mainButton,
+                            child: const SizedBox(
+                              width: 250,
+                              child: Text(
+                                "Войти",
+                                textAlign: TextAlign.center,
+                                style: AuthTextStyles.buttonText,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        /// Кнопка "зарегистрироваться"
+
+                        Center(
+                          child: TextButton(
+                            onPressed: () => Navigator.pushReplacementNamed(
+                                context, '/sign-up'),
+                            style: AuthButtonsStyles.secondaryButton,
+                            child: const SizedBox(
+                              width: 250,
+                              child: Text(
+                                "Зарегистрироваться",
+                                textAlign: TextAlign.center,
+                                style: AuthTextStyles.buttonText,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        /// Вход через российские платформы
+                        const Text(
+                          "Войти через: ",
+                          style: AuthTextStyles.pharagraph,
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Center(
+                          child: GosuslugiButton(
+                            onTap: () => Navigator.pushNamed(
+                                context, '/sign-in/gosuslugi'),
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        /// ОК и ВК
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            OKButton(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, '/sign-in/ok'),
+                            ),
+                            SizedBox(width: 50),
+                            VKButton(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, '/sign-in/vk'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-
-            const SizedBox(height: 10),
-
-            /// Кнопка "зарегистрироваться"
-            Center(
-              child: TextButton(
-                onPressed: () =>
-                    Navigator.pushReplacementNamed(context, '/sign-up'),
-                style: AuthButtonsStyles.secondaryButton,
-                child: const SizedBox(
-                  width: 300,
-                  child: Text(
-                    "Зарегистрироваться",
-                    textAlign: TextAlign.center,
-                    style: LoginAndSignUpFontStyles.buttonText,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 50),
-
-            /// Вход через российские платформы
-            const Text(
-              "Войти через: ",
-              style: LoginAndSignUpFontStyles.pharagraph,
-            ),
-
-            const SizedBox(height: 20),
-            Center(
-              child: GosuslugiButton(
-                onTap: () => Navigator.pushNamed(context, '/sign-in/gosuslugi'),
-              ),
-            ),
-            SizedBox(height: 10),
-
-            /// ОК и ВК
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OKButton(
-                    onTap: () => Navigator.pushNamed(context, '/sign-in/ok'),
-                  ),
-                  SizedBox(width: 50),
-                  VKButton(
-                    onTap: () => Navigator.pushNamed(context, '/sign-in/vk'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  AppBar SignInAppBar() {
-    return AppBar(
-      title: const Text(
-        "Войти",
-        style: LoginAndSignUpFontStyles.header,
+          ),
+        ],
       ),
     );
   }

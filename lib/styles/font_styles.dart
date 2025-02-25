@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-abstract class LoginAndSignUpFontStyles {
+abstract class AuthTextStyles {
   // Login / SignUn
-  
+
   static const TextStyle header = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.w500,
