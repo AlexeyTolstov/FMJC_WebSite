@@ -38,3 +38,14 @@ abstract class AppButtonStyles {
         WidgetStateProperty.all(AppColors.cancelButtonColorBackground),
   );
 }
+
+abstract class TutorialButtonStyles {
+  static final ButtonStyle actionButton = ButtonStyle(
+    foregroundColor: WidgetStateProperty.all(
+      AppColors.saveButtonColorForeground,
+    ),
+    backgroundColor: WidgetStateProperty.all(
+      Colors.red,
+    ),
+  );
+}

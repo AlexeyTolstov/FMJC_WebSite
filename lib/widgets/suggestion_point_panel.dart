@@ -67,6 +67,20 @@ class SuggestionPointPanel extends StatelessWidget {
                       maxLines: 10,
                       enabled: isEnable,
                     ),
+                    SizedBox(height: 10),
+                    if (!isEnable)
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.favorite_border),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.block),
+                          ),
+                        ],
+                      ),
                     Spacer(),
                     Row(
                       children: [
@@ -76,6 +90,18 @@ class SuggestionPointPanel extends StatelessWidget {
                               TextButton(
                                 style: AppButtonStyles.saveButton,
                                 onPressed: () {
+                                  if (nameController.text.length == 0 ||
+                                      descriptionController.text.length == 0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Поля не должны быть пустыми'),
+                                        duration: Duration(seconds: 3),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
                                   if (isHaveId(suggestion.id)) {
                                     editSuggestion(
                                       suggestion.id,

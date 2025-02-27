@@ -20,3 +20,17 @@ abstract class AuthTextStyles {
     fontSize: 17,
   );
 }
+
+abstract class TutorialTextStyles {
+  static const TextStyle title = TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.w500,
+    fontSize: 30,
+  );
+
+  static const TextStyle text = TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.w300,
+    fontSize: 17,
+  );
+}

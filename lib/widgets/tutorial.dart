@@ -1,88 +1,157 @@
 import 'package:flutter/material.dart';
+import 'package:maps_application/pages/tutorial/1_location_marker.dart';
+import 'package:maps_application/pages/tutorial/2_marker_point.dart';
+import 'package:maps_application/pages/tutorial/3_user_suggestion.dart';
+import 'package:maps_application/styles/button_styles.dart';
+import 'package:maps_application/styles/font_styles.dart';
 
 class Lesson {
-  final String title;
-  final String description;
+  final Widget? titleWidget;
+  final Widget? bodyWidget;
 
-  Lesson({required this.title, required this.description});
+  Lesson({
+    this.titleWidget,
+    this.bodyWidget,
+  });
 }
 
 class Tutorial {
   final BuildContext context;
+  int indexTutorial = 0;
+
   Tutorial(this.context);
 
-  void showTutorialDialog() {
+  void startDialog() {
     _showDialog(
-      title: "Добро пожаловать!",
-      content: "Хотите пройти небольшое обучение по использованию приложения?",
+      titleWidget: Text(
+        'Добро пожаловать!',
+        style: TutorialTextStyles.title,
+      ),
+      bodyWidget: Text(
+        'Хотите небольшое обучение?',
+        style: TutorialTextStyles.text,
+      ),
       actions: [
-        _dialogButton("Нет, я все знаю", () => Navigator.pop(context)),
-        _dialogButton("Да", () {
-          _showStep(0);
-        }),
+        TextButton(
+          style: TutorialButtonStyles.actionButton,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Нет, я все знаю'),
+        ),
+        TextButton(
+          style: TutorialButtonStyles.actionButton,
+          onPressed: () {
+            Navigator.pop(context);
+            _showDialog(
+              titleWidget: steps.first.titleWidget,
+              bodyWidget: steps.first.bodyWidget,
+              actions: actionsButtons(),
+            );
+          },
+          child: Text('Да'),
+        ),
       ],
     );
   }
 
-  final List<String> steps = [
-    "На карте отмечены красные маркеры — это предложения пользователей. Нажмите на них, чтобы просмотреть детали и оставить свою оценку.",
-    "Чтобы добавить свою точку с предложением, просто коснитесь нужного места, введите текст — и всё готово!",
-    "Хотите предложить или изучить идеи, создать маршрут? Вверху справа находится меню — откройте его, и получите доступ ко всем возможностям.",
-    "Спасибо, что установили Альфа-версию! Мы ценим ваш интерес!",
+  final List<Lesson> steps = [
+    Lesson(
+      titleWidget: const Text(
+        'Обучение',
+        style: TutorialTextStyles.title,
+      ),
+      bodyWidget: Tutorial_1(),
+    ),
+    Lesson(
+      titleWidget: const Text(
+        'Обучение',
+        style: TutorialTextStyles.title,
+      ),
+      bodyWidget: Tutorial_2(),
+    ),
+    Lesson(
+      titleWidget: const Text(
+        'Обучение',
+        style: TutorialTextStyles.title,
+      ),
+      bodyWidget: Tutorial_3(),
+    ),
+    Lesson(
+      titleWidget: const Text(
+        'Обучение',
+        style: TutorialTextStyles.title,
+      ),
+      bodyWidget: Text(
+        'Спасибо, что запустили альфа-версию',
+        style: TutorialTextStyles.text,
+      ),
+    ),
   ];
 
-  void _showStep(int stepIndex) {
-    _showDialog(
-      title: "Обучение",
-      content: steps[stepIndex],
-      actions: [
-        if (stepIndex > 0)
-          _dialogButton("<- Назад", () => _showStep(stepIndex - 1)),
-        if (stepIndex < steps.length - 1)
-          _dialogButton("Дальше ->", () => _showStep(stepIndex + 1))
-        else
-          _dialogButton("Завершить!", () {}),
-      ],
-      backgroundColor: Colors.transparent,
-      textColor: Colors.white,
-    );
-  }
-
   void _showDialog({
-    required String title,
-    required String content,
-    required List<Widget> actions,
-    Color backgroundColor = Colors.white,
-    Color textColor = Colors.black,
+    Widget? titleWidget,
+    Widget? bodyWidget,
+    List<Widget>? actions,
   }) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: backgroundColor,
-        title: Text(title, style: TextStyle(color: textColor)),
-        content: Container(
-          padding: EdgeInsets.all(20),
-          child: Text(
-            content,
-            style: TextStyle(color: textColor, fontSize: 17),
-          ),
-        ),
+        backgroundColor: Colors.transparent,
+        title: titleWidget,
+        content: SingleChildScrollView(child: bodyWidget),
         actions: actions,
       ),
     );
   }
 
-  TextButton _dialogButton(String text, VoidCallback onPressed) {
-    return TextButton(
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(Colors.white),
-      ),
-      onPressed: () {
-        Navigator.pop(context);
-        onPressed();
-      },
-      child: Text(text),
-    );
+  List<Widget> actionsButtons() {
+    List<Widget> actions = [];
+    if (indexTutorial != 0)
+      actions.add(
+        TextButton(
+          style: TutorialButtonStyles.actionButton,
+          onPressed: () {
+            Navigator.pop(context);
+            indexTutorial--;
+            _showDialog(
+              titleWidget: steps[indexTutorial].titleWidget,
+              bodyWidget: steps[indexTutorial].bodyWidget,
+              actions: actionsButtons(),
+            );
+          },
+          child: Text('<- Назад'),
+        ),
+      );
+
+    if (indexTutorial == steps.length - 1)
+      actions.add(
+        TextButton(
+          style: TutorialButtonStyles.actionButton,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Завершить'),
+        ),
+      );
+    else
+      actions.add(
+        TextButton(
+          style: TutorialButtonStyles.actionButton,
+          onPressed: () {
+            Navigator.pop(context);
+            indexTutorial++;
+            _showDialog(
+              titleWidget: steps[indexTutorial].titleWidget,
+              bodyWidget: steps[indexTutorial].bodyWidget,
+              actions: actionsButtons(),
+            );
+          },
+          child: Text('Дальше ->'),
+        ),
+      );
+
+    return actions;
   }
 }

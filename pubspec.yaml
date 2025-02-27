@@ -32,3 +32,6 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/tutorial/1/
+    - assets/images/tutorial/2/
+    - assets/images/tutorial/3/

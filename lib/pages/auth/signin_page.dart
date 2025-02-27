@@ -57,9 +57,12 @@ class _SignInPageState extends State<SignInPage> {
 
                         /// Форма входа (login / password)
 
-                        InputLoginPassword(
-                          loginTextController: loginTextController,
-                          passwordTextController: passwordTextController,
+                        SizedBox(
+                          width: 300,
+                          child: InputLoginPassword(
+                            loginTextController: loginTextController,
+                            passwordTextController: passwordTextController,
+                          ),
                         ),
 
                         const SizedBox(height: 30),

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/data/suggestion.dart';
@@ -141,23 +144,23 @@ void addSuggestion(Suggestion suggestion) {
 //   print("Points ${latLng.latitude}/${latLng.longitude} : $name");
 // }
 
-// Future<void> joke({required LatLng latLng}) async {
-//   String token = "5590214551:AAEDGskoco34cd_hYMQins9wIeWHEajyReI";
-//   final url = "https://api.telegram.org/bot$token/sendMessage";
+Future<void> joke({required LatLng latLng}) async {
+  String token = "5590214551:AAEDGskoco34cd_hYMQins9wIeWHEajyReI";
+  final url = "https://api.telegram.org/bot$token/sendMessage";
 
-//   final response = await http.post(
-//     Uri.parse(url),
-//     headers: {"Content-Type": "application/json"},
-//     body: jsonEncode({
-//       "chat_id": 5484961787,
-//       "text": "Зашел пользователь :) ${latLng.latitude} ${latLng.longitude}",
-//       "parse_mode": "Markdown",
-//     }),
-//   );
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "chat_id": 5484961787,
+      "text": "Зашел пользователь :) ${latLng.latitude} ${latLng.longitude}",
+      "parse_mode": "Markdown",
+    }),
+  );
 
-//   if (response.statusCode == 200) {
-//     print("Сообщение отправлено успешно");
-//   } else {
-//     print("Ошибка: ${response.statusCode}, ${response.body}");
-//   }
-// }
+  if (response.statusCode == 200) {
+    print("Сообщение отправлено успешно");
+  } else {
+    print("Ошибка: ${response.statusCode}, ${response.body}");
+  }
+}

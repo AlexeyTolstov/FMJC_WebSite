@@ -6,6 +6,7 @@ import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/widgets/suggestion_point_panel.dart';
+import 'package:maps_application/widgets/tutorial.dart';
 
 int myId = 0;
 
@@ -20,10 +21,11 @@ class _MainPageState extends State<MainPage> {
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
 
+  late final Tutorial _tutorial;
+
   LatLng? tempGeoPoint;
   Suggestion? openedSuggestion;
 
-  List<Suggestion> _listPoints = [];
   List<Marker> _listMarkers = [];
 
   bool isOpened = false;
@@ -53,7 +55,7 @@ class _MainPageState extends State<MainPage> {
 
     final Position position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
+        accuracy: LocationAccuracy.best,
       ),
     );
 
@@ -65,7 +67,11 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    getPosition();
+    getPosition().whenComplete(() {
+      joke(latLng: _currentLocation ?? LatLng(0, 0));
+    });
+    _tutorial = Tutorial(context);
+    Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
