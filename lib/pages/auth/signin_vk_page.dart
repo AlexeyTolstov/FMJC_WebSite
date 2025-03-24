@@ -18,11 +18,11 @@ class _SignInVKPageState extends State<SignInVKPage> {
       appBar: SignInAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Вход через ВК не реализован >_<"),
-          ],
+        child: Center(
+          child: Text(
+            'Вход через ВКонтакте находится в процессе разработки',
+            style: AuthTextStyles.header_small,
+          ),
         ),
       ),
     );

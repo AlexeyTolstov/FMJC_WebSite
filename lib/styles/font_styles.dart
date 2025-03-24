@@ -8,6 +8,11 @@ abstract class AuthTextStyles {
     fontWeight: FontWeight.w500,
   );
 
+  static const TextStyle header_small = TextStyle(
+    fontSize: 25,
+    fontWeight: FontWeight.w300,
+  );
+
   static const TextStyle hintText = TextStyle(
     fontSize: 30,
   );

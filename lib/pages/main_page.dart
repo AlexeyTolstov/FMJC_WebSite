@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:maps_application/widgets/panel.dart';
 import 'package:maps_application/widgets/suggestion_point_panel.dart';
 import 'package:maps_application/widgets/tutorial.dart';
 
@@ -110,53 +111,72 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      body: Stack(
-        children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              onTap: _onMapTap,
-              initialCenter: _currentLocation ?? LatLng(0, 0),
-              initialZoom: 2,
-              minZoom: 0,
-              maxZoom: 100,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              ),
-              CurrentLocationLayer(
-                style: LocationMarkerStyle(
-                  marker: DefaultLocationMarker(
-                    child: Icon(
-                      Icons.location_pin,
-                      color: Colors.white,
+      body: LayoutBuilder(builder: (context, constraints) {
+        return Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  if (constraints.maxWidth > 500)
+                    Panel(constraints: constraints),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            onTap: _onMapTap,
+                            initialCenter: _currentLocation ?? LatLng(0, 0),
+                            initialZoom: 2,
+                            minZoom: 0,
+                            maxZoom: 100,
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            ),
+                            CurrentLocationLayer(
+                              style: LocationMarkerStyle(
+                                marker: DefaultLocationMarker(
+                                  child: Icon(
+                                    Icons.location_pin,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                markerSize: Size(35, 35),
+                                markerDirection: MarkerDirection.heading,
+                              ),
+                            ),
+                            MarkerLayer(
+                              markers: _listMarkers,
+                            ),
+                          ],
+                        ),
+                        if (isOpened)
+                          SuggestionPointPanel(
+                            suggestion: tempSuggestion!,
+                            isEnable: tempSuggestion!.author_id == myId,
+                            onClose: () {
+                              setState(
+                                () {
+                                  isOpened = false;
+                                  tempSuggestion = null;
+                                },
+                              );
+                            },
+                          ),
+                      ],
                     ),
                   ),
-                  markerSize: Size(35, 35),
-                  markerDirection: MarkerDirection.heading,
-                ),
+                ],
               ),
-              MarkerLayer(
-                markers: _listMarkers,
-              ),
-            ],
-          ),
-          if (isOpened)
-            SuggestionPointPanel(
-              suggestion: tempSuggestion!,
-              isEnable: tempSuggestion!.author_id == myId,
-              onClose: () {
-                setState(
-                  () {
-                    isOpened = false;
-                    tempSuggestion = null;
-                  },
-                );
-              },
             ),
-        ],
-      ),
+            if (constraints.maxWidth <= 500 && !isOpened)
+              Panel(constraints: constraints),
+          ],
+        );
+      }),
       floatingActionButton: (!isOpened && _currentLocation != null)
           ? FloatingActionButton(
               onPressed: _userCurrentLocation,

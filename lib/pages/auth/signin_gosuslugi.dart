@@ -18,11 +18,11 @@ class _SignInGosuslugiPageState extends State<SignInGosuslugiPage> {
       appBar: SignInAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Вход через ГосУслуги еще не реализован >_<"),
-          ],
+        child: Center(
+          child: Text(
+            'Вход через ГосУслуги находится в процессе разработки',
+            style: AuthTextStyles.header_small,
+          ),
         ),
       ),
     );

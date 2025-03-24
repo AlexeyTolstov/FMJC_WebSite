@@ -18,11 +18,11 @@ class _SignInOKPageState extends State<SignInOKPage> {
       appBar: SignInAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Вход через ОК не реализован >_<"),
-          ],
+        child: Center(
+          child: Text(
+            'Вход через Одноклассники находится в процессе разработки',
+            style: AuthTextStyles.header_small,
+          ),
         ),
       ),
     );
