@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:maps_application/api/fetch_adress.dart';
+import 'package:maps_application/api/fetch_route.dart';
 import 'package:maps_application/user_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-Future<String> searchAdress(LatLng latLng) async {
-  final response = await http.get(
-    Uri.parse(
-        'https://nominatim.openstreetmap.org/reverse?lat=${latLng.latitude}&lon=${latLng.longitude}&format=jsonv2'),
-    headers: {"Content-Type": "application/json"},
-  );
-  final body = jsonDecode(response.body);
-  return body['address']['road'];
-}
+import 'package:maps_application/widgets/route_item.dart';
+import 'package:maps_application/widgets/suggestion_route_panel.dart';
 
 class Point {
   final LatLng latLng;
-  String adress = '';
+  String adress = 'Улица';
 
   Point({required this.latLng});
 }
@@ -35,10 +26,17 @@ class _AddRoutePageState extends State<AddRoutePage> {
   final _mapController = MapController();
   List<Point> listPoint = [];
   List<LatLng> route = [];
+  bool isOpened = false;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  void save() {
+    setState(() {
+      isOpened = true;
+    });
   }
 
   void add_point(TapPosition tapPosition, LatLng latLng) {
@@ -49,47 +47,10 @@ class _AddRoutePageState extends State<AddRoutePage> {
   }
 
   void fetchRouteUpdate() {
-    fetchRoute().whenComplete(() {
-      setState(() {});
-    });
-  }
-
-  Future<void> fetchRoute() async {
-    if (listPoint.length < 2) {
-      route = [];
-      return;
-    }
-
-    final pointsString = listPoint
-        .map((p) => '${p.latLng.longitude},${p.latLng.latitude}')
-        .join(';');
-    final url = Uri.parse(
-        'http://router.project-osrm.org/route/v1/driving/$pointsString?overview=full&geometries=polyline');
-
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['routes'].isNotEmpty) {
-          _decodePolyline(data['routes'][0]['geometry']);
-        } else {
-          print('Маршрут не найден');
-        }
-      } else {
-        print('Ошибка загрузки маршрута: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Ошибка запроса: $e');
-    }
-  }
-
-  void _decodePolyline(String encodedPolyline) {
-    final polylinePoints = PolylinePoints();
-    final decodedPoints = polylinePoints.decodePolyline(encodedPolyline);
-
-    setState(() {
-      route =
-          decodedPoints.map((p) => LatLng(p.latitude, p.longitude)).toList();
+    fetchRoute(listPoint.map((e) => e.latLng).toList()).then((readyRoute) {
+      setState(() {
+        route = readyRoute;
+      });
     });
   }
 
@@ -105,6 +66,12 @@ class _AddRoutePageState extends State<AddRoutePage> {
             mapController: _mapController,
             options: MapOptions(
               onTap: add_point,
+              onMapReady: () {
+                _mapController.move(
+                  UserService().userLatLng ?? LatLng(52.5008896, 85.147648),
+                  15,
+                );
+              },
               initialCenter: UserService().userLatLng ?? LatLng(0, 0),
               initialZoom: 2,
               minZoom: 0,
@@ -159,6 +126,7 @@ class _AddRoutePageState extends State<AddRoutePage> {
           PanelPoints(
             listPoint: listPoint,
             fetchRouteUpdate: fetchRouteUpdate,
+            onSave: save,
           ),
           if (UserService().userLatLng != null)
             Positioned(
@@ -176,6 +144,12 @@ class _AddRoutePageState extends State<AddRoutePage> {
                 ),
               ),
             ),
+          if (isOpened)
+            SuggestionRoutePanel(onClose: () {
+              setState(() {
+                isOpened = false;
+              });
+            })
         ],
       ),
     );
@@ -184,12 +158,14 @@ class _AddRoutePageState extends State<AddRoutePage> {
 
 class PanelPoints extends StatefulWidget {
   final List<Point> listPoint;
+  final VoidCallback onSave;
   final VoidCallback fetchRouteUpdate;
 
   const PanelPoints({
     super.key,
     required this.listPoint,
     required this.fetchRouteUpdate,
+    required this.onSave,
   });
 
   @override
@@ -211,79 +187,68 @@ class _PanelPointsState extends State<PanelPoints> {
   @override
   Widget build(BuildContext context) {
     for (Point point in widget.listPoint) {
-      searchAdress(point.latLng).then((String adress) {
-        point.adress = adress;
-        print(adress);
-      });
+      if (point.adress == 'Улица')
+        fetchAdress(point.latLng).then((String adress) {
+          setState(() {
+            point.adress = adress;
+          });
+        });
     }
 
     return Container(
       color: Colors.white,
       width: 500,
       height: double.infinity,
-      child: ReorderableListView.builder(
-        buildDefaultDragHandles: false,
-        itemCount: widget.listPoint.length,
-        itemBuilder: (context, index) => ListTile(
-          key: ValueKey(index),
-          title: ReorderableDragStartListener(
-            index: index,
-            child: PointRouterItem(
-              index: index,
-              text: widget.listPoint[index].adress,
-              onTapDelete: () {
-                onTapDelete(index);
-                widget.fetchRouteUpdate();
+      child: Column(
+        children: [
+          Text('Точки для маршрута'),
+          Expanded(
+            child: ReorderableListView.builder(
+              buildDefaultDragHandles: false,
+              itemCount: widget.listPoint.length,
+              itemBuilder: (context, index) => ListTile(
+                key: ValueKey(index),
+                title: RouteItemWidget(
+                  index: index,
+                  latLng: widget.listPoint[index].latLng,
+                  text: widget.listPoint[index].adress,
+                  onTapDelete: () {
+                    onTapDelete(index);
+                    widget.fetchRouteUpdate();
+                  },
+                ),
+              ),
+              onReorder: (oldIndex, newIndex) {
+                setState(() {
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
+                  final item = widget.listPoint.removeAt(oldIndex);
+                  widget.listPoint.insert(newIndex, item);
+                  widget.fetchRouteUpdate();
+                });
               },
             ),
           ),
-        ),
-        onReorder: (oldIndex, newIndex) {
-          setState(() {
-            if (oldIndex < newIndex) {
-              newIndex -= 1;
-            }
-            final item = widget.listPoint.removeAt(oldIndex);
-            widget.listPoint.insert(newIndex, item);
-            widget.fetchRouteUpdate();
-          });
-        },
-      ),
-    );
-  }
-}
-
-class PointRouterItem extends StatelessWidget {
-  final int index;
-  final String text;
-  final VoidCallback onTapDelete;
-
-  const PointRouterItem({
-    super.key,
-    required this.index,
-    required this.onTapDelete,
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 450,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text((index + 1).toString()),
-          Text(text),
-          IconButton(
-            onPressed: onTapDelete,
-            icon: Icon(Icons.delete_outline),
+          Text('Вы завершили построение маршрута?'),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: widget.onSave,
+                  child: Text('Завершить'),
+                ),
+                SizedBox(width: 20),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Отмена'),
+                ),
+              ],
+            ),
           ),
         ],
       ),
