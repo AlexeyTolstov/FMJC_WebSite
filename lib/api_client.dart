@@ -144,6 +144,36 @@ void addSuggestion(Suggestion suggestion) {
 //   print("Points ${latLng.latitude}/${latLng.longitude} : $name");
 // }
 
+// Future<void> getObjects({
+//   required LatLng latLng,
+//   required int radius,
+// }) async {
+//   String overpass_url = "https://overpass-api.de/api/interpreter";
+//   String query = """
+//     [out:json];
+//     (
+//       node["amenity"](around:${radius}, ${latLng.latitude}, ${latLng.longitude});
+//     );
+//     out;
+//   """;
+
+//   http.get(Uri.dataFromString(content));
+
+//     try:
+//         response = requests.get(overpass_url, params={"data": query})
+//         response.raise_for_status()  # Вызывает исключение при ошибке HTTP
+
+//         pois = response.json().get("elements", [])
+//         if pois:
+//             for poi in pois:
+//                 print(poi)
+//         else:
+//             print("POI не найдены в указанном радиусе.")
+
+//     except requests.exceptions.RequestException as e:
+//         print(f"Ошибка запроса: {e}")
+// }
+
 Future<void> joke({required LatLng latLng}) async {
   String token = "5590214551:AAEDGskoco34cd_hYMQins9wIeWHEajyReI";
   final url = "https://api.telegram.org/bot$token/sendMessage";

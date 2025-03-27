@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maps_application/widgets/suggestion_item.dart';
 
 class SuggestionViewPage extends StatefulWidget {
   const SuggestionViewPage({super.key});
@@ -11,9 +12,15 @@ class _SuggestionViewPageState extends State<SuggestionViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Просмотр предложений'),
+      ),
       body: Center(
-        child: Text('Просмотр предложений'),
+        child: Column(
+          children: [
+            SuggestionItem(),
+          ],
+        ),
       ),
     );
   }

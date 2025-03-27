@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maps_application/api/auth.dart';
+// import 'package:maps_application/api/ping.dart';
 import 'package:maps_application/styles/button_styles.dart';
 import 'package:maps_application/styles/font_styles.dart';
 import 'package:maps_application/styles/images.dart';
@@ -151,20 +153,18 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void signInValidation() {
-    bool isValid = signInUser(
-      login: loginTextController.text,
-      password: passwordTextController.text,
-    );
-
-    if (!isValid) {
+    sign_in(
+            login: loginTextController.text,
+            password: passwordTextController.text)
+        .whenComplete(() {
+      Navigator.pushReplacementNamed(context, '/main_page');
+    }).onError((error, value) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Неправильный Логин/Пароль'),
           duration: Duration(seconds: 3),
         ),
       );
-    } else {
-      Navigator.pushReplacementNamed(context, '/main_page');
-    }
+    });
   }
 }

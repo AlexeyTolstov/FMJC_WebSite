@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:maps_application/user_service.dart';
 import 'package:maps_application/widgets/panel.dart';
 import 'package:maps_application/widgets/suggestion_point_panel.dart';
 import 'package:maps_application/widgets/tutorial.dart';
@@ -61,6 +62,7 @@ class _MainPageState extends State<MainPage> {
     );
 
     _currentLocation = LatLng(position.latitude, position.longitude);
+    UserService().userLatLng = _currentLocation;
     _userCurrentLocation();
     setState(() {});
   }
@@ -69,7 +71,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     getPosition().whenComplete(() {
-      joke(latLng: _currentLocation ?? LatLng(0, 0));
+      // joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
     _tutorial = Tutorial(context);
     Future.delayed(Duration.zero, () => _tutorial.startDialog());
@@ -148,11 +150,22 @@ class _MainPageState extends State<MainPage> {
                                 markerDirection: MarkerDirection.heading,
                               ),
                             ),
-                            MarkerLayer(
-                              markers: _listMarkers,
-                            ),
                           ],
                         ),
+                        if (!isOpened && _currentLocation != null)
+                          Positioned(
+                            right: 10,
+                            bottom: 10,
+                            child: FloatingActionButton(
+                              onPressed: _userCurrentLocation,
+                              backgroundColor: Colors.blue,
+                              child: Icon(
+                                Icons.my_location,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ),
+                          ),
                         if (isOpened)
                           SuggestionPointPanel(
                             suggestion: tempSuggestion!,
@@ -177,16 +190,6 @@ class _MainPageState extends State<MainPage> {
           ],
         );
       }),
-      floatingActionButton: (!isOpened && _currentLocation != null)
-          ? FloatingActionButton(
-              onPressed: _userCurrentLocation,
-              backgroundColor: Colors.blue,
-              child: Icon(
-                Icons.my_location,
-                color: Colors.white,
-                size: 32,
-              ))
-          : null,
     );
   }
 }
