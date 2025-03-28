@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:maps_application/api/poi.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
@@ -28,7 +29,11 @@ class _MainPageState extends State<MainPage> {
   LatLng? tempGeoPoint;
   Suggestion? openedSuggestion;
 
+  bool isReady = false;
+
   List<Marker> _listMarkers = [];
+
+  List<POIData> _listPOI = [];
 
   bool isOpened = false;
   Suggestion? tempSuggestion;
@@ -73,24 +78,39 @@ class _MainPageState extends State<MainPage> {
     getPosition().whenComplete(() {
       // joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
+    fetchPoi(LatLng(52.5008896, 85.147648), 2000).then((e) {
+      setState(() {
+        print(e);
+        _listPOI = e;
+      });
+    });
     _tutorial = Tutorial(context);
     Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
-    isOpened = true;
-    tempSuggestion = Suggestion(
-      name: '',
-      description: '',
-      author_id: myId,
-      coords: latLng,
-    );
-    setState(() {});
+    if (isReady && _mapController.camera.zoom >= 10) {
+      isOpened = true;
+      tempSuggestion = Suggestion(
+        name: '',
+        description: '',
+        author_id: myId,
+        coords: latLng,
+      );
+      setState(() {});
+    }
+  }
+
+  void onMapReady() {
+    setState(() {
+      isReady = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     _listMarkers = [];
+
     for (var s in getListPoints()) {
       Marker _marker = Marker(
         width: 50,
@@ -112,6 +132,26 @@ class _MainPageState extends State<MainPage> {
       _listMarkers.add(_marker);
     }
 
+    for (var p in _listPOI) {
+      Marker _marker = Marker(
+        width: 30,
+        height: 30,
+        point: p.latLng,
+        child: GestureDetector(
+          child: Icon(
+            Icons.circle,
+            color: Colors.blue,
+            size: 30,
+          ),
+          onTap: () {
+            print(p.tags);
+          },
+        ),
+      );
+
+      _listMarkers.add(_marker);
+    }
+
     return Scaffold(
       body: LayoutBuilder(builder: (context, constraints) {
         return Column(
@@ -128,6 +168,14 @@ class _MainPageState extends State<MainPage> {
                           mapController: _mapController,
                           options: MapOptions(
                             onTap: _onMapTap,
+                            onMapEvent: (MapEvent mapEvent) {
+                              if (mapEvent.source ==
+                                  MapEventSource.scrollWheel) {
+                                print(mapEvent.camera.zoom);
+                                setState(() {});
+                              }
+                            },
+                            onMapReady: onMapReady,
                             initialCenter: _currentLocation ?? LatLng(0, 0),
                             initialZoom: 2,
                             minZoom: 0,
@@ -150,6 +198,10 @@ class _MainPageState extends State<MainPage> {
                                 markerDirection: MarkerDirection.heading,
                               ),
                             ),
+                            if (isReady && _mapController.camera.zoom >= 10)
+                              MarkerLayer(
+                                markers: _listMarkers,
+                              ),
                           ],
                         ),
                         if (!isOpened && _currentLocation != null)
