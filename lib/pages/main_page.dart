@@ -11,6 +11,20 @@ import 'package:maps_application/widgets/panel.dart';
 import 'package:maps_application/widgets/suggestion_point_panel.dart';
 import 'package:maps_application/widgets/tutorial.dart';
 
+import 'dart:math';
+
+double distanceBetweenPoints(LatLng latLng1, LatLng latLng2) {
+  const double earthRadiusM = 1113200;
+
+  double avgLat = (latLng1.latitude + latLng2.latitude) / 2;
+  double dx = (latLng2.longitude - latLng1.longitude) *
+      earthRadiusM *
+      cos(avgLat * pi / 180);
+  double dy = (latLng2.latitude - latLng1.latitude) * earthRadiusM;
+
+  return sqrt(dx * dx + dy * dy);
+}
+
 int myId = 0;
 
 class MainPage extends StatefulWidget {
@@ -31,12 +45,12 @@ class _MainPageState extends State<MainPage> {
 
   bool isReady = false;
 
-  List<Marker> _listMarkers = [];
-
   List<POIData> _listPOI = [];
 
   bool isOpened = false;
   Suggestion? tempSuggestion;
+
+  LatLng? lastCenter;
 
   Future<void> _userCurrentLocation() async {
     if (_currentLocation != null) {
@@ -78,14 +92,8 @@ class _MainPageState extends State<MainPage> {
     getPosition().whenComplete(() {
       // joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
-    fetchPoi(LatLng(52.5008896, 85.147648), 2000).then((e) {
-      setState(() {
-        print(e);
-        _listPOI = e;
-      });
-    });
-    _tutorial = Tutorial(context);
-    Future.delayed(Duration.zero, () => _tutorial.startDialog());
+    // _tutorial = Tutorial(context);
+    // Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
@@ -109,47 +117,22 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    _listMarkers = [];
-
-    for (var s in getListPoints()) {
-      Marker _marker = Marker(
-        width: 50,
-        height: 50,
-        point: s.coords!,
-        child: GestureDetector(
-          child: Icon(
-            Icons.location_pin,
-            color: Colors.red,
-            size: 50,
-          ),
-          onTap: () {
-            isOpened = true;
-            tempSuggestion = s;
-            setState(() {});
-          },
-        ),
-      );
-      _listMarkers.add(_marker);
-    }
-
-    for (var p in _listPOI) {
-      Marker _marker = Marker(
-        width: 30,
-        height: 30,
-        point: p.latLng,
-        child: GestureDetector(
-          child: Icon(
-            Icons.circle,
-            color: Colors.blue,
-            size: 30,
-          ),
-          onTap: () {
-            print(p.tags);
-          },
-        ),
-      );
-
-      _listMarkers.add(_marker);
+    if (isReady && false) {
+      if (_mapController.camera.zoom >= 12) {
+        if (lastCenter == null) {
+          lastCenter = _mapController.camera.center;
+        } else {
+          if (distanceBetweenPoints(lastCenter!, _mapController.camera.center) >
+              5000) {
+            fetchPoi(_mapController.camera.center, 10000).then((e) {
+              setState(() {
+                _listPOI = e;
+              });
+            });
+            lastCenter = _mapController.camera.center;
+          }
+        }
+      }
     }
 
     return Scaffold(
@@ -198,9 +181,44 @@ class _MainPageState extends State<MainPage> {
                                 markerDirection: MarkerDirection.heading,
                               ),
                             ),
-                            if (isReady && _mapController.camera.zoom >= 10)
+                            if (isReady)
                               MarkerLayer(
-                                markers: _listMarkers,
+                                markers: [
+                                  if (_mapController.camera.zoom >= 10)
+                                    ...getListPoints().map((s) => Marker(
+                                          width: 50,
+                                          height: 50,
+                                          point: s.coords!,
+                                          child: GestureDetector(
+                                            child: Icon(
+                                              Icons.location_pin,
+                                              color: Colors.red,
+                                              size: 50,
+                                            ),
+                                            onTap: () {
+                                              isOpened = true;
+                                              tempSuggestion = s;
+                                              setState(() {});
+                                            },
+                                          ),
+                                        )),
+                                  if (_mapController.camera.zoom >= 14)
+                                    ..._listPOI.map((p) => Marker(
+                                          width: 30,
+                                          height: 30,
+                                          point: p.latLng,
+                                          child: GestureDetector(
+                                            child: Icon(
+                                              Icons.circle,
+                                              color: Colors.blue,
+                                              size: 30,
+                                            ),
+                                            onTap: () {
+                                              print(p.tags);
+                                            },
+                                          ),
+                                        )),
+                                ],
                               ),
                           ],
                         ),
