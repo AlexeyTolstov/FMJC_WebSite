@@ -123,13 +123,15 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isReady) {
+    if (isReady && false) {
+      // РАЗБЛОКИРОВАТЬ КОГДА БУДЕТ ГОТОВО!!!!
       if (_mapController.camera.zoom >= 12) {
         if (lastCenter == null) {
           lastCenter = _mapController.camera.center;
         } else {
           if (distanceBetweenPoints(lastCenter!, _mapController.camera.center) >
               5000) {
+            print('Update');
             fetchPoi(_mapController.camera.center, 10000).then((e) {
               setState(() {
                 _listPOI = e;

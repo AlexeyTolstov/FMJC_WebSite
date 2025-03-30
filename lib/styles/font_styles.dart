@@ -39,3 +39,29 @@ abstract class TutorialTextStyles {
     fontSize: 17,
   );
 }
+
+abstract class MainTextStyles {
+  static const TextStyle header = TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w300,
+    fontSize: 20,
+  );
+
+  static const TextStyle title = TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w300,
+    fontSize: 17,
+  );
+}
+
+abstract class FileUploadTextStyles {
+  static const TextStyle name = TextStyle(
+    color: Colors.black,
+    fontSize: 17,
+  );
+
+  static const TextStyle size = TextStyle(
+    color: Colors.black,
+    fontSize: 12,
+  );
+}
