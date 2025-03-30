@@ -107,7 +107,7 @@ class _AddSuggestionPageState extends State<AddSuggestionPage> {
                     },
                     style: AppButtonStyles.cancelButton,
                     child: Text(
-                      'Отмема',
+                      'Отмена',
                     ),
                   ),
                 ],

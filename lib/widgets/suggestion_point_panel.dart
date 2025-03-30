@@ -128,7 +128,7 @@ class SuggestionPointPanel extends StatelessWidget {
                           onPressed: onClose,
                           style: AppButtonStyles.cancelButton,
                           child: Text(
-                            (isEnable) ? 'Отмема' : 'Закрыть',
+                            (isEnable) ? 'Отмена' : 'Закрыть',
                           ),
                         ),
                       ],

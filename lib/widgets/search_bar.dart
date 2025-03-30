@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:maps_application/api/search_places.dart';
 
 class MySearchBar extends StatefulWidget {
-  const MySearchBar({super.key});
+  final Function(Place) onSearchItemTap;
+  const MySearchBar({
+    super.key,
+    required this.onSearchItemTap,
+  });
 
   @override
   State<MySearchBar> createState() => _MySearchBarState();
@@ -10,42 +14,58 @@ class MySearchBar extends StatefulWidget {
 
 class _MySearchBarState extends State<MySearchBar> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   /// Params for search
 
   String _lastText = '';
   bool _isSearching = false;
-  List<Places> _searchResult = [];
+  List<Place> _searchResult = [];
 
   void search() {
-    if (_controller.text.length < 3 || _isSearching) return;
+    if (_isSearching) return;
+    if (_controller.text.length < 3) {
+      setState(() {
+        _searchResult = [];
+      });
+      return;
+    }
 
     if (_lastText != _controller.text) {
       _isSearching = true;
       _lastText = _controller.text;
 
-      print('abc');
-      searchPlaces(query: _controller.text).then((List<Places> searchResult) {
-        print(searchResult);
+      searchPlaces(query: _controller.text).then((List<Place> searchResult) {
         setState(() {
           _searchResult = searchResult;
           _isSearching = false;
         });
-      }).onError((e, _) {
-        print(e);
       });
     }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      Future.delayed(Duration(milliseconds: 100)).then((e) => setState(() {}));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.max,
       children: [
         Container(
-          width: 1000,
           child: TextField(
             textAlignVertical: TextAlignVertical.center,
             controller: _controller,
+            focusNode: _focusNode,
+            onChanged: (_) {
+              search();
+            },
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(25),
               suffixIcon: IconButton(
@@ -63,33 +83,46 @@ class _MySearchBarState extends State<MySearchBar> {
             ),
           ),
         ),
-        Container(
-          width: 900,
-          child: Column(
-            spacing: 5,
-            children:
-                _searchResult.map((e) => SearchResultItem(data: e)).toList(),
+        if (_focusNode.hasFocus)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 70),
+            child: Column(
+              spacing: 5,
+              children: _searchResult
+                  .map(
+                    (e) => SearchResultItem(
+                      data: e,
+                      onTap: () => widget.onSearchItemTap(e),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
-        ),
       ],
     );
   }
 }
 
 class SearchResultItem extends StatelessWidget {
-  final Places data;
+  final Place data;
+  final VoidCallback onTap;
+
   const SearchResultItem({
     super.key,
     required this.data,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      width: 900,
-      height: 50,
-      child: Text(data.toString()),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        color: Colors.white,
+        width: double.infinity,
+        height: 50,
+        child: Text(data.toString()),
+      ),
     );
   }
 }

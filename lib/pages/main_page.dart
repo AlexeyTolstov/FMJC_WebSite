@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:maps_application/api/search_places.dart';
 import 'package:maps_application/api_client.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
@@ -78,6 +79,10 @@ class _MainPageState extends State<MainPage> {
     Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
+  void onSearchItemTap(Place place) {
+    _mapController.move(place.latLng, 15);
+  }
+
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
     isOpened = true;
     tempSuggestion = Suggestion(
@@ -104,9 +109,12 @@ class _MainPageState extends State<MainPage> {
             size: 50,
           ),
           onTap: () {
-            isOpened = true;
-            tempSuggestion = s;
-            setState(() {});
+            if (_mapController.camera.zoom >= 10) {
+              setState(() {
+                isOpened = true;
+                tempSuggestion = s;
+              });
+            }
           },
         ),
       );
@@ -180,10 +188,13 @@ class _MainPageState extends State<MainPage> {
                               );
                             },
                           ),
-                        Positioned(
-                          left: 100,
+                        Positioned.fill(
+                          left: 50,
+                          right: 50,
                           top: 10,
-                          child: MySearchBar(),
+                          child: MySearchBar(
+                            onSearchItemTap: onSearchItemTap,
+                          ),
                         ),
                       ],
                     ),

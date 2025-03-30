@@ -37,22 +37,22 @@ class Address {
   }
 }
 
-class Places {
+class Place {
   final String displayName;
   final LatLng latLng;
   final Address adress;
 
-  Places({
+  Place({
     required this.displayName,
     required this.adress,
     required this.latLng,
   });
 
-  factory Places.fromJson(Map<String, dynamic> data) {
-    return Places(
+  factory Place.fromJson(Map<String, dynamic> data) {
+    return Place(
       displayName: data['properties']['display_name'],
-      latLng: LatLng(data['geometry']['coordinates'][0],
-          data['geometry']['coordinates'][1]),
+      latLng: LatLng(data['geometry']['coordinates'][1],
+          data['geometry']['coordinates'][0]),
       adress: Address.fromJson(
           data['properties']['address'] as Map<String, dynamic>),
     );
@@ -60,13 +60,12 @@ class Places {
 
   @override
   String toString() {
-    return '$displayName: ';
-    //$latLng
+    return '$displayName: $latLng';
   }
 }
 
 /// `searchPlaces` - поиск достопримечательностей, улиц и др
-Future<List<Places>> searchPlaces(
+Future<List<Place>> searchPlaces(
     {required String query, int limit = 10}) async {
   if (query.length <= 3) {
     return [];
@@ -83,6 +82,6 @@ Future<List<Places>> searchPlaces(
 
   if (body['features'] is! List) return [];
   return (body['features'] as List)
-      .map((data) => Places.fromJson(data as Map<String, dynamic>))
+      .map((data) => Place.fromJson(data as Map<String, dynamic>))
       .toList();
 }
