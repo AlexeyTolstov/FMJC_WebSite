@@ -7,6 +7,7 @@ import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/user_service.dart';
 import 'package:maps_application/widgets/panel.dart';
+import 'package:maps_application/widgets/search_bar.dart';
 import 'package:maps_application/widgets/suggestion_point_panel.dart';
 import 'package:maps_application/widgets/tutorial.dart';
 
@@ -179,6 +180,11 @@ class _MainPageState extends State<MainPage> {
                               );
                             },
                           ),
+                        Positioned(
+                          left: 100,
+                          top: 10,
+                          child: MySearchBar(),
+                        ),
                       ],
                     ),
                   ),
