@@ -65,8 +65,7 @@ class Place {
 }
 
 /// `searchPlaces` - поиск достопримечательностей, улиц и др
-Future<List<Place>> searchPlaces(
-    {required String query, int limit = 10}) async {
+Future<List<Place>> searchPlaces({required String query, int limit = 5}) async {
   if (query.length <= 3) {
     return [];
   }

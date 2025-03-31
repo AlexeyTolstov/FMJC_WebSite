@@ -20,7 +20,7 @@ class RouteItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
-      width: 450,
+      width: 400,
       height: 70,
       decoration: BoxDecoration(
         border: Border.all(
@@ -33,7 +33,7 @@ class RouteItemWidget extends StatelessWidget {
           Text((index + 1).toString()),
           SizedBox(width: 10),
           SizedBox(
-            width: 250,
+            width: 200,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -48,12 +48,12 @@ class RouteItemWidget extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 5),
           ReorderableDragStartListener(
             child: Icon(Icons.menu),
             index: index,
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 5),
           IconButton(
             onPressed: onTapDelete,
             icon: Icon(Icons.delete_outline),

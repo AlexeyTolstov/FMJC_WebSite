@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:maps_application/api/fetch_adress.dart';
+import 'package:maps_application/api/fetch_address.dart';
 import 'package:maps_application/api/fetch_route.dart';
 import 'package:maps_application/api/search_places.dart';
 import 'package:maps_application/user_service.dart';
@@ -12,7 +12,7 @@ import 'package:maps_application/widgets/suggestion_route_panel.dart';
 
 class Point {
   final LatLng latLng;
-  String adress = 'Улица';
+  String address = 'Улица';
 
   Point({required this.latLng});
 }
@@ -66,119 +66,142 @@ class _AddRoutePageState extends State<AddRoutePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          PanelPoints(
-            listPoint: listPoint,
-            fetchRouteUpdate: fetchRouteUpdate,
-            onSave: save,
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    onTap: add_point,
-                    onMapReady: () {
-                      _mapController.move(
-                        UserService().userLatLng ??
-                            LatLng(52.5008896, 85.147648),
-                        15,
-                      );
-                    },
-                    initialCenter: UserService().userLatLng ?? LatLng(0, 0),
-                    initialZoom: 2,
-                    minZoom: 0,
-                    maxZoom: 100,
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      body: LayoutBuilder(builder: (context, constraints) {
+        return Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  if (constraints.maxWidth > 500)
+                    PanelPoints(
+                      listPoint: listPoint,
+                      fetchRouteUpdate: fetchRouteUpdate,
+                      onSave: save,
+                      constraints: constraints,
                     ),
-                    CurrentLocationLayer(
-                      style: LocationMarkerStyle(
-                        marker: DefaultLocationMarker(
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Colors.white,
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            onTap: add_point,
+                            onMapReady: () {
+                              Future.delayed(Duration(milliseconds: 300))
+                                  .whenComplete(() {
+                                _mapController.move(
+                                  UserService().userLatLng ??
+                                      LatLng(52.5008896, 85.147648),
+                                  15,
+                                );
+                              });
+                            },
+                            initialCenter:
+                                UserService().userLatLng ?? LatLng(0, 0),
+                            initialZoom: 2,
+                            minZoom: 0,
+                            maxZoom: 100,
                           ),
-                        ),
-                        markerSize: Size(35, 35),
-                        markerDirection: MarkerDirection.heading,
-                      ),
-                    ),
-                    MarkerLayer(
-                      markers: listPoint
-                          .map((Point point) => Marker(
-                                width: 50,
-                                height: 50,
-                                child: GestureDetector(
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            ),
+                            CurrentLocationLayer(
+                              style: LocationMarkerStyle(
+                                marker: DefaultLocationMarker(
                                   child: Icon(
                                     Icons.location_pin,
-                                    color: Colors.red,
-                                    size: 50,
+                                    color: Colors.white,
                                   ),
-                                  onTap: () {
-                                    setState(() {});
-                                  },
                                 ),
-                                point: point.latLng,
-                              ))
-                          .toList(),
-                    ),
-                    PolylineLayer(
-                      polylines: [
-                        Polyline(
-                          points: route,
-                          color: Colors.red,
-                          strokeWidth: 5,
+                                markerSize: Size(35, 35),
+                                markerDirection: MarkerDirection.heading,
+                              ),
+                            ),
+                            MarkerLayer(
+                              markers: listPoint
+                                  .map((Point point) => Marker(
+                                        width: 50,
+                                        height: 50,
+                                        child: GestureDetector(
+                                          child: Icon(
+                                            Icons.location_pin,
+                                            color: Colors.red,
+                                            size: 50,
+                                          ),
+                                          onTap: () {
+                                            setState(() {});
+                                          },
+                                        ),
+                                        point: point.latLng,
+                                      ))
+                                  .toList(),
+                            ),
+                            PolylineLayer(
+                              polylines: [
+                                Polyline(
+                                  points: route,
+                                  color: Colors.red,
+                                  strokeWidth: 5,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        if (UserService().userLatLng != null)
+                          Positioned(
+                            right: 10,
+                            bottom: 10,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                _mapController.move(
+                                    UserService().userLatLng!, 15);
+                              },
+                              backgroundColor: Colors.blue,
+                              child: Icon(
+                                Icons.my_location,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ),
+                          ),
+                        if (isOpened)
+                          SuggestionRoutePanel(onClose: () {
+                            setState(() {
+                              isOpened = false;
+                            });
+                          }),
+                        Positioned.fill(
+                          left: 50,
+                          right: 50,
+                          top: 10,
+                          child: MySearchBar(
+                            onSearchItemTap: onSearchItemTap,
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-                if (UserService().userLatLng != null)
-                  Positioned(
-                    right: 10,
-                    bottom: 10,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _mapController.move(UserService().userLatLng!, 15);
-                      },
-                      backgroundColor: Colors.blue,
-                      child: Icon(
-                        Icons.my_location,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
                   ),
-                if (isOpened)
-                  SuggestionRoutePanel(onClose: () {
-                    setState(() {
-                      isOpened = false;
-                    });
-                  }),
-                Positioned.fill(
-                  left: 50,
-                  right: 50,
-                  top: 10,
-                  child: MySearchBar(
-                    onSearchItemTap: onSearchItemTap,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+            if (constraints.maxWidth <= 500)
+              PanelPoints(
+                listPoint: listPoint,
+                fetchRouteUpdate: fetchRouteUpdate,
+                onSave: save,
+                constraints: constraints,
+              ),
+          ],
+        );
+      }),
     );
   }
 }
 
 class PanelPoints extends StatefulWidget {
+  final BoxConstraints constraints;
   final List<Point> listPoint;
   final VoidCallback onSave;
   final VoidCallback fetchRouteUpdate;
@@ -188,6 +211,7 @@ class PanelPoints extends StatefulWidget {
     required this.listPoint,
     required this.fetchRouteUpdate,
     required this.onSave,
+    required this.constraints,
   });
 
   @override
@@ -209,18 +233,18 @@ class _PanelPointsState extends State<PanelPoints> {
   @override
   Widget build(BuildContext context) {
     for (Point point in widget.listPoint) {
-      if (point.adress == 'Улица')
-        fetchAdress(point.latLng).then((String adress) {
+      if (point.address == 'Улица')
+        fetchAddress(point.latLng).then((String address) {
           setState(() {
-            point.adress = adress;
+            point.address = address;
           });
         });
     }
 
     return Container(
       color: Colors.white,
-      width: 500,
-      height: double.infinity,
+      width: (widget.constraints.maxWidth <= 500) ? double.infinity : 500,
+      height: (widget.constraints.maxWidth <= 500) ? 200 : double.infinity,
       child: Column(
         children: [
           Text('Добавить маршрут'),
@@ -234,7 +258,7 @@ class _PanelPointsState extends State<PanelPoints> {
                 title: RouteItemWidget(
                   index: index,
                   latLng: widget.listPoint[index].latLng,
-                  text: widget.listPoint[index].adress,
+                  text: widget.listPoint[index].address,
                   onTapDelete: () {
                     onTapDelete(index);
                     widget.fetchRouteUpdate();

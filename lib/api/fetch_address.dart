@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 /// `fetchAdress` - получение улицы по координатам `LatLng`
-Future<String> fetchAdress(LatLng latLng) async {
+Future<String> fetchAddress(LatLng latLng) async {
   final response = await http.get(
     Uri.parse(
         'https://nominatim.openstreetmap.org/reverse?lat=${latLng.latitude.toStringAsFixed(3)}&lon=${latLng.longitude.toStringAsFixed(3)}&format=jsonv2'),

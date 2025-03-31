@@ -15,9 +15,7 @@ class _HomePageState extends State<HomePage> {
         title: Text('Проект на FMJC'),
       ),
       body: Column(
-        children: [
-          Text('Здесь будет описан проект'),
-        ],
+        children: [],
       ),
     );
   }

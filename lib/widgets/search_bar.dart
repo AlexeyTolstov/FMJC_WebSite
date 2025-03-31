@@ -49,7 +49,7 @@ class _MySearchBarState extends State<MySearchBar> {
   void initState() {
     super.initState();
     _focusNode.addListener(() {
-      Future.delayed(Duration(milliseconds: 100)).then((e) => setState(() {}));
+      Future.delayed(Duration(milliseconds: 300)).then((e) => setState(() {}));
     });
   }
 
