@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maps_application/api_client.dart';
+import 'package:maps_application/data/suggestion.dart';
 import 'package:maps_application/widgets/suggestion_item.dart';
 
 class SuggestionViewPage extends StatefulWidget {
@@ -15,11 +17,13 @@ class _SuggestionViewPageState extends State<SuggestionViewPage> {
       appBar: AppBar(
         title: Text('Просмотр предложений'),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
-          children: [
-            SuggestionItem(),
-          ],
+          children: allSuggestions
+              .map((Suggestion s) => SuggestionItem(
+                    suggestion: s,
+                  ))
+              .toList(),
         ),
       ),
     );

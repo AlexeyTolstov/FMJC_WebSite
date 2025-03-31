@@ -53,6 +53,7 @@ class _MainPageState extends State<MainPage> {
   Suggestion? tempSuggestion;
 
   LatLng? lastCenter;
+  LatLng? searchPoint;
 
   Future<void> _userCurrentLocation() async {
     if (_currentLocation != null) {
@@ -92,14 +93,17 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     getPosition().whenComplete(() {
-      // joke(latLng: _currentLocation ?? LatLng(0, 0));
+      joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
-    // _tutorial = Tutorial(context);
-    // Future.delayed(Duration.zero, () => _tutorial.startDialog());
+    _tutorial = Tutorial(context);
+    Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void onSearchItemTap(Place place) {
     _mapController.move(place.latLng, 15);
+    setState(() {
+      searchPoint = place.latLng;
+    });
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng latLng) {
@@ -225,6 +229,26 @@ class _MainPageState extends State<MainPage> {
                                             },
                                           ),
                                         )),
+                                  if (searchPoint != null)
+                                    Marker(
+                                      point: searchPoint!,
+                                      child: GestureDetector(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 5,
+                                              color: Colors.white,
+                                            ),
+                                            color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          width: 30,
+                                          height: 30,
+                                        ),
+                                        onTap: () {},
+                                      ),
+                                    ),
                                 ],
                               ),
                           ],
@@ -256,14 +280,15 @@ class _MainPageState extends State<MainPage> {
                               );
                             },
                           ),
-                        Positioned.fill(
-                          left: 50,
-                          right: 50,
-                          top: 10,
-                          child: MySearchBar(
-                            onSearchItemTap: onSearchItemTap,
+                        if (!isOpened)
+                          Positioned.fill(
+                            left: 50,
+                            right: 50,
+                            top: 10,
+                            child: MySearchBar(
+                              onSearchItemTap: onSearchItemTap,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),

@@ -4,7 +4,7 @@ import 'package:maps_application/data/suggestion.dart';
 import 'package:maps_application/pages/main_page.dart';
 import 'package:maps_application/styles/button_styles.dart';
 
-class SuggestionPointPanel extends StatelessWidget {
+class SuggestionPointPanel extends StatefulWidget {
   final Suggestion suggestion;
   final VoidCallback onClose;
   final bool isEnable;
@@ -17,13 +17,28 @@ class SuggestionPointPanel extends StatelessWidget {
   });
 
   @override
+  State<SuggestionPointPanel> createState() => _SuggestionPointPanelState();
+}
+
+class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  final int likes = 10;
+  final int dislikes = 1;
+
+  String? errorTextName;
+  String? errorTextDescription;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController.text = widget.suggestion.name;
+    descriptionController.text = widget.suggestion.description;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
-
-    nameController.text = suggestion.name;
-    descriptionController.text = suggestion.description;
-
     return Stack(
       children: [
         GestureDetector(
@@ -33,7 +48,7 @@ class SuggestionPointPanel extends StatelessWidget {
             color: Color.fromRGBO(0, 0, 0, 0.5),
           ),
           onPanUpdate: (_) {},
-          onTap: onClose,
+          onTap: widget.onClose,
         ),
         Center(
           child: Padding(
@@ -44,7 +59,7 @@ class SuggestionPointPanel extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               width: 400,
-              height: 500,
+              height: 530,
               child: Padding(
                 padding: const EdgeInsets.all(30),
                 child: Column(
@@ -54,37 +69,56 @@ class SuggestionPointPanel extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: "Название",
                         border: OutlineInputBorder(),
+                        labelText: 'Название идеи',
+                        errorText: errorTextName,
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
                       ),
-                      enabled: isEnable,
+                      maxLength: 100,
+                      readOnly: !widget.isEnable,
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
                     TextField(
                       controller: descriptionController,
                       decoration: InputDecoration(
                         hintText: "Описание",
                         border: OutlineInputBorder(),
+                        labelText: 'Описание идеи',
+                        errorText: errorTextDescription,
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
                       ),
+                      maxLength: 500,
                       maxLines: 10,
-                      enabled: isEnable,
+                      readOnly: !widget.isEnable,
                     ),
                     SizedBox(height: 10),
-                    if (!isEnable)
+                    if (!widget.isEnable)
                       Row(
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.favorite_border),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.thumb_up_outlined),
+                              ),
+                              Text(likes.toString()),
+                            ],
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.block),
+                          SizedBox(width: 30),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.thumb_down_outlined),
+                              ),
+                              Text(dislikes.toString()),
+                            ],
                           ),
                         ],
                       ),
                     Spacer(),
                     Row(
                       children: [
-                        if (isEnable)
+                        if (widget.isEnable)
                           Row(
                             children: [
                               TextButton(
@@ -92,19 +126,25 @@ class SuggestionPointPanel extends StatelessWidget {
                                 onPressed: () {
                                   if (nameController.text.length == 0 ||
                                       descriptionController.text.length == 0) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Поля не должны быть пустыми'),
-                                        duration: Duration(seconds: 3),
-                                      ),
-                                    );
+                                    setState(() {
+                                      if (nameController.text.length == 0)
+                                        errorTextName =
+                                            'Поле не должно быть пустым';
+                                      else
+                                        errorTextName = null;
+                                      if (descriptionController.text.length ==
+                                          0)
+                                        errorTextDescription =
+                                            'Поле не должно быть пустым';
+                                      else
+                                        errorTextDescription = null;
+                                    });
                                     return;
                                   }
 
-                                  if (isHaveId(suggestion.id)) {
+                                  if (isHaveId(widget.suggestion.id)) {
                                     editSuggestion(
-                                      suggestion.id,
+                                      widget.suggestion.id,
                                       name: nameController.text,
                                       description: descriptionController.text,
                                     );
@@ -113,11 +153,11 @@ class SuggestionPointPanel extends StatelessWidget {
                                       name: nameController.text,
                                       description: descriptionController.text,
                                       author_id: myId,
-                                      coords: suggestion.coords,
-                                      category: suggestion.category,
+                                      coords: widget.suggestion.coords,
+                                      category: widget.suggestion.category,
                                     ));
                                   }
-                                  onClose();
+                                  widget.onClose();
                                 },
                                 child: Text('Сохранить'),
                               ),
@@ -125,10 +165,10 @@ class SuggestionPointPanel extends StatelessWidget {
                             ],
                           ),
                         TextButton(
-                          onPressed: onClose,
+                          onPressed: widget.onClose,
                           style: AppButtonStyles.cancelButton,
                           child: Text(
-                            (isEnable) ? 'Отмена' : 'Закрыть',
+                            (widget.isEnable) ? 'Отмена' : 'Закрыть',
                           ),
                         ),
                       ],

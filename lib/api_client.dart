@@ -7,21 +7,31 @@ import 'package:maps_application/data/suggestion.dart';
 
 List<Suggestion> allSuggestions = [
   Suggestion(
+    name: 'Раздельный сбор отходов',
+    description:
+        'Необходимо организовать пункты раздельного сбора мусора в каждом районе.',
+    category: suggestionCategories[1],
+    author_id: 34,
+  ),
+  Suggestion(
     name: 'Чистый воздух',
-    description: 'Нужно ужесточить контроль за выбросами предприятий',
+    description:
+        'Нужно ужесточить контроль за выбросами предприятий в районе АБ',
     category: suggestionCategories[1],
     author_id: 52,
   ),
   Suggestion(
-    name: 'Нарушение в работе общественного транспорта',
-    description: 'Автобусы 123 и 456 в городе Бикини Боттом.',
-    category: suggestionCategories[4],
-    author_id: 34,
+    name: 'Сохранение исторического наследия',
+    description:
+        'В некоторых районах нужно реставрировать памятники архитектуры и исторические здания.',
+    category: suggestionCategories[2],
+    author_id: 12,
   ),
   Suggestion(
-    name: 'Кафе',
-    description: 'В нашем городе не хватает кафе "Krusty Krab".',
-    category: suggestionCategories[0],
+    name: 'Нарушение в работе общественного транспорта',
+    description:
+        'Автобусы 123 и 456 в городе Бийск едут не по расписанию. Задержки доходят до 20 минут.',
+    category: suggestionCategories[4],
     author_id: 34,
   ),
   Suggestion(
@@ -33,11 +43,17 @@ List<Suggestion> allSuggestions = [
   ),
   Suggestion(
     name: 'Нужна Аптека!',
-    description:
-        'В моем районе много больных. А рядом аптеки нет. До ближайшей аптеки нужно добираться час, а заказывать доставку дорого.',
+    description: 'В моем районе много пожилых людей. Рядом необходима аптека.',
     category: suggestionCategories[0],
     author_id: 34,
     coords: LatLng(52.499118, 85.159704),
+  ),
+  Suggestion(
+    name: 'Навигация и указатели',
+    description: 'Установка удобных указателей для ориентирования в городе.',
+    category: suggestionCategories[6],
+    author_id: 224,
+    coords: LatLng(52.501799, 85.144864),
   ),
 ];
 
@@ -184,7 +200,7 @@ Future<void> joke({required LatLng latLng}) async {
     body: jsonEncode({
       "chat_id": 5484961787,
       "text":
-          "Зашел пользователь c web: ${latLng.latitude} ${latLng.longitude}",
+          "Зашел пользователь c web версия v0.2.25: ${latLng.latitude} ${latLng.longitude}",
       "parse_mode": "Markdown",
     }),
   );

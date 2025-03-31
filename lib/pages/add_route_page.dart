@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:maps_application/api/fetch_address.dart';
 import 'package:maps_application/api/fetch_route.dart';
 import 'package:maps_application/api/search_places.dart';
+import 'package:maps_application/styles/font_styles.dart';
 import 'package:maps_application/user_service.dart';
 import 'package:maps_application/widgets/route_item.dart';
 import 'package:maps_application/widgets/search_bar.dart';
@@ -86,19 +87,9 @@ class _AddRoutePageState extends State<AddRoutePage> {
                           mapController: _mapController,
                           options: MapOptions(
                             onTap: add_point,
-                            onMapReady: () {
-                              Future.delayed(Duration(milliseconds: 300))
-                                  .whenComplete(() {
-                                _mapController.move(
-                                  UserService().userLatLng ??
-                                      LatLng(52.5008896, 85.147648),
-                                  15,
-                                );
-                              });
-                            },
-                            initialCenter:
-                                UserService().userLatLng ?? LatLng(0, 0),
-                            initialZoom: 2,
+                            initialCenter: UserService().userLatLng ??
+                                LatLng(52.5008896, 85.147648),
+                            initialZoom: 15,
                             minZoom: 0,
                             maxZoom: 100,
                           ),
@@ -247,8 +238,14 @@ class _PanelPointsState extends State<PanelPoints> {
       height: (widget.constraints.maxWidth <= 500) ? 200 : double.infinity,
       child: Column(
         children: [
-          Text('Добавить маршрут'),
-          Text('Точки для маршрута'),
+          Text(
+            'Добавить маршрут',
+            style: MainTextStyles.header,
+          ),
+          Text(
+            'Точки для маршрута',
+            style: MainTextStyles.title,
+          ),
           Expanded(
             child: ReorderableListView.builder(
               buildDefaultDragHandles: false,
