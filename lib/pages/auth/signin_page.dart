@@ -142,7 +142,7 @@ class _SignInPageState extends State<SignInPage> {
                           ],
                         ),
                         Align(
-                          child: Text('v0.2.25'),
+                          child: Text('v0.2.26'),
                           alignment: Alignment.bottomRight,
                         ),
                       ],
