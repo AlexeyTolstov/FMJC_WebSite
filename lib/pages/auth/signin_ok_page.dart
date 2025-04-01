@@ -15,6 +15,7 @@ class _SignInOKPageState extends State<SignInOKPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: SignInAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
