@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:maps_application/styles/button_styles.dart';
 
-class SuggestionRoutePanel extends StatelessWidget {
+class SuggestionRoutePanel extends StatefulWidget {
   final VoidCallback onClose;
 
   SuggestionRoutePanel({super.key, required this.onClose});
 
+  @override
+  State<SuggestionRoutePanel> createState() => _SuggestionRoutePanelState();
+}
+
+class _SuggestionRoutePanelState extends State<SuggestionRoutePanel> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+
+  String? errorTextName;
+  String? errorTextDesc;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +28,7 @@ class SuggestionRoutePanel extends StatelessWidget {
             color: Color.fromRGBO(0, 0, 0, 0.5),
           ),
           onPanUpdate: (_) {},
-          onTap: onClose,
+          onTap: widget.onClose,
         ),
         Center(
           child: Padding(
@@ -39,7 +47,9 @@ class SuggestionRoutePanel extends StatelessWidget {
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
-                        hintText: "Название",
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        errorText: errorTextName,
+                        labelText: "Название идеи",
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -47,7 +57,9 @@ class SuggestionRoutePanel extends StatelessWidget {
                     TextField(
                       controller: descriptionController,
                       decoration: InputDecoration(
-                        hintText: "Описание",
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        errorText: errorTextDesc,
+                        labelText: "Описание идеи",
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 10,
@@ -63,13 +75,16 @@ class SuggestionRoutePanel extends StatelessWidget {
                               onPressed: () {
                                 if (nameController.text.length == 0 ||
                                     descriptionController.text.length == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Поля не должны быть пустыми'),
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  );
+                                  if (nameController.text.length == 0)
+                                    errorTextName =
+                                        'Поле не должно быть пустым';
+
+                                  if (descriptionController.text.length == 0)
+                                    errorTextDesc =
+                                        'Поле не должно быть пустым';
+
+                                  setState(() {});
+
                                   return;
                                 }
                                 Navigator.pop(context);
@@ -81,7 +96,7 @@ class SuggestionRoutePanel extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () {
-                            onClose();
+                            widget.onClose();
                             Navigator.pop(context);
                           },
                           style: AppButtonStyles.cancelButton,

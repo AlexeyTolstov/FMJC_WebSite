@@ -200,7 +200,7 @@ Future<void> joke({required LatLng latLng}) async {
     body: jsonEncode({
       "chat_id": 5484961787,
       "text":
-          "Зашел пользователь c web версия v0.2.25: ${latLng.latitude} ${latLng.longitude}",
+          "Зашел пользователь c web версия v0.2.30: ${latLng.latitude} ${latLng.longitude}",
       "parse_mode": "Markdown",
     }),
   );

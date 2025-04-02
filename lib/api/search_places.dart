@@ -60,7 +60,7 @@ class Place {
 
   @override
   String toString() {
-    return '$displayName: $latLng';
+    return '$displayName';
   }
 }
 

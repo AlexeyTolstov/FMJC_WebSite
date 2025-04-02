@@ -161,19 +161,22 @@ class _AddRoutePageState extends State<AddRoutePage> {
                                 ),
                               ),
                             if (isOpened)
-                              SuggestionRoutePanel(onClose: () {
-                                setState(() {
-                                  isOpened = false;
-                                });
-                              }),
-                            Positioned.fill(
-                              left: 50,
-                              right: 50,
-                              top: 10,
-                              child: MySearchBar(
-                                onSearchItemTap: onSearchItemTap,
+                              SuggestionRoutePanel(
+                                onClose: () {
+                                  setState(() {
+                                    isOpened = false;
+                                  });
+                                },
+                              )
+                            else
+                              Positioned.fill(
+                                left: 50,
+                                right: 50,
+                                top: 10,
+                                child: MySearchBar(
+                                  onSearchItemTap: onSearchItemTap,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -182,7 +185,7 @@ class _AddRoutePageState extends State<AddRoutePage> {
                 ),
               ],
             ),
-            if (constraints.maxWidth <= 500)
+            if (constraints.maxWidth <= 500 && !isOpened)
               PanelPointsBottom(
                 listPoint: listPoint,
                 fetchRouteUpdate: fetchRouteUpdate,
@@ -347,76 +350,82 @@ class _PanelPointsBottomState extends State<PanelPointsBottom> {
     }
 
     return DraggableScrollableSheet(
-      initialChildSize: .3,
-      minChildSize: .3,
-      maxChildSize: .9,
+      initialChildSize: .2,
+      minChildSize: .2,
+      maxChildSize: 1,
       builder: (BuildContext context, ScrollController scrollController) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          child: Container(
-            color: Colors.white,
-            width: double.infinity,
-            child: Column(
-              children: [
-                Text(
-                  'Добавить маршрут',
-                  style: MainTextStyles.header,
-                ),
-                Text(
-                  'Точки для маршрута',
-                  style: MainTextStyles.title,
-                ),
-                Container(
-                  height: 500,
-                  child: ReorderableListView.builder(
-                    buildDefaultDragHandles: false,
-                    itemCount: widget.listPoint.length,
-                    itemBuilder: (context, index) => ListTile(
-                      key: ValueKey(index),
+        return Container(
+          color: Colors.white,
+          padding: const EdgeInsets.all(5),
+          child: CustomScrollView(
+            controller: scrollController,
+            shrinkWrap: true,
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text('Добавить маршрут',
+                              style: MainTextStyles.header)),
+                      IconButton(
+                        onPressed: widget.onSave,
+                        icon: Container(
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Container(
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(25),
+                            // border: Border.all()
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text('Точки для маршрута', style: MainTextStyles.title),
+                  Container(
+                    child: Column(
+                      children: [],
+                    ),
+                  ),
+                  for (int i = 0; i < widget.listPoint.length; i++)
+                    ListTile(
+                      key: ValueKey(i),
                       title: RouteItemWidget(
-                        index: index,
-                        latLng: widget.listPoint[index].latLng,
-                        text: widget.listPoint[index].address,
+                        index: i,
+                        latLng: widget.listPoint[i].latLng,
+                        text: widget.listPoint[i].address,
                         onTapDelete: () {
-                          onTapDelete(index);
+                          onTapDelete(i);
                           widget.fetchRouteUpdate();
                         },
                       ),
                     ),
-                    onReorder: (oldIndex, newIndex) {
-                      setState(() {
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
-                        }
-                        final item = widget.listPoint.removeAt(oldIndex);
-                        widget.listPoint.insert(newIndex, item);
-                        widget.fetchRouteUpdate();
-                      });
-                    },
-                  ),
-                ),
-                Text('Вы завершили построение маршрута?'),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: widget.onSave,
-                        child: Text('Завершить'),
-                      ),
-                      SizedBox(width: 20),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Отмена'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                ]),
+              ),
+            ],
           ),
         );
       },

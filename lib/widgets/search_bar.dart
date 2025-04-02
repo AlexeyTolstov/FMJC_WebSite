@@ -85,7 +85,6 @@ class _MySearchBarState extends State<MySearchBar> {
         ),
         if (_focusNode.hasFocus)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 70),
             child: Column(
               spacing: 5,
               children: _searchResult
