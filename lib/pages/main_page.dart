@@ -93,10 +93,10 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     getPosition().whenComplete(() {
-      joke(latLng: _currentLocation ?? LatLng(0, 0));
+      // joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
-    _tutorial = Tutorial(context);
-    Future.delayed(Duration.zero, () => _tutorial.startDialog());
+    // _tutorial = Tutorial(context);
+    // Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void onSearchItemTap(Place place) {

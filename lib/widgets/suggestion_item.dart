@@ -12,10 +12,9 @@ class SuggestionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 500,
-      height: 120,
+      height: 150,
       decoration: BoxDecoration(
-        border: Border.all(),
-      ),
+          border: Border.all(), borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -31,6 +30,32 @@ class SuggestionItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             maxLines: 3,
           ),
+          Spacer(),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.thumb_up_outlined),
+                        Text(' 10'),
+                      ],
+                    ),
+                    SizedBox(width: 30),
+                    Row(
+                      children: [
+                        Icon(Icons.thumb_down_outlined),
+                        Text(' 12'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

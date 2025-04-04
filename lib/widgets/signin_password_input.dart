@@ -4,10 +4,15 @@ class InputLoginPassword extends StatefulWidget {
   final TextEditingController loginTextController;
   final TextEditingController passwordTextController;
 
+  final String? loginErrorText;
+  final String? passwordErrorText;
+
   const InputLoginPassword({
     super.key,
     required this.loginTextController,
     required this.passwordTextController,
+    required this.loginErrorText,
+    required this.passwordErrorText,
   });
 
   @override
@@ -23,7 +28,8 @@ class _InputLoginPasswordState extends State<InputLoginPassword> {
       children: [
         TextField(
           controller: widget.loginTextController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
+            errorText: widget.loginErrorText,
             hintText: "Логин, e-mail или телефон",
             border: OutlineInputBorder(),
           ),
@@ -33,6 +39,7 @@ class _InputLoginPasswordState extends State<InputLoginPassword> {
           controller: widget.passwordTextController,
           obscureText: isHide,
           decoration: InputDecoration(
+            errorText: widget.passwordErrorText,
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {

@@ -5,7 +5,6 @@ import 'package:maps_application/pages/auth/signin_gosuslugi.dart';
 import 'package:maps_application/pages/auth/signin_ok_page.dart';
 import 'package:maps_application/pages/auth/signin_page.dart';
 import 'package:maps_application/pages/auth/signin_vk_page.dart';
-import 'package:maps_application/pages/home_page.dart';
 import 'package:maps_application/pages/main_page.dart';
 import 'package:maps_application/pages/auth/signup_page.dart';
 import 'package:maps_application/pages/suggestion_view_page.dart';

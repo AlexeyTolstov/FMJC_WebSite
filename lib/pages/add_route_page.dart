@@ -113,25 +113,6 @@ class _AddRoutePageState extends State<AddRoutePage> {
                                     markerDirection: MarkerDirection.heading,
                                   ),
                                 ),
-                                MarkerLayer(
-                                  markers: listPoint
-                                      .map((Point point) => Marker(
-                                            width: 50,
-                                            height: 50,
-                                            child: GestureDetector(
-                                              child: Icon(
-                                                Icons.location_pin,
-                                                color: Colors.red,
-                                                size: 50,
-                                              ),
-                                              onTap: () {
-                                                setState(() {});
-                                              },
-                                            ),
-                                            point: point.latLng,
-                                          ))
-                                      .toList(),
-                                ),
                                 PolylineLayer(
                                   polylines: [
                                     Polyline(
@@ -140,6 +121,60 @@ class _AddRoutePageState extends State<AddRoutePage> {
                                       strokeWidth: 5,
                                     ),
                                   ],
+                                ),
+                                MarkerLayer(
+                                  markers: listPoint
+                                      .asMap()
+                                      .map(
+                                        (index, Point point) => MapEntry(
+                                          index,
+                                          Marker(
+                                            width: 50,
+                                            height: 50,
+                                            child: GestureDetector(
+                                              child: Stack(
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_pin,
+                                                    color: Colors.red,
+                                                    size: 50,
+                                                  ),
+                                                  Positioned.fill(
+                                                    top: 5,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topCenter,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.red,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Text(
+                                                          (index + 1)
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 20,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              onTap: () {
+                                                setState(() {});
+                                              },
+                                            ),
+                                            point: point.latLng,
+                                          ),
+                                        ),
+                                      )
+                                      .values
+                                      .toList(),
                                 ),
                               ],
                             ),

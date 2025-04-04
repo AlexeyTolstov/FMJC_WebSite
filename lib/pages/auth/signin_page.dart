@@ -21,6 +21,9 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController loginTextController = TextEditingController();
   final TextEditingController passwordTextController = TextEditingController();
 
+  String? loginErrorText;
+  String? passwordErrorText;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +68,8 @@ class _SignInPageState extends State<SignInPage> {
                           child: InputLoginPassword(
                             loginTextController: loginTextController,
                             passwordTextController: passwordTextController,
+                            loginErrorText: loginErrorText,
+                            passwordErrorText: passwordErrorText,
                           ),
                         ),
 
@@ -162,14 +167,16 @@ class _SignInPageState extends State<SignInPage> {
             login: loginTextController.text,
             password: passwordTextController.text)
         .whenComplete(() {
+      setState(() {
+        loginErrorText = null;
+        passwordErrorText = null;
+      });
       Navigator.pushReplacementNamed(context, '/main_page');
     }).onError((error, value) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Неправильный Логин/Пароль'),
-          duration: Duration(seconds: 3),
-        ),
-      );
+      setState(() {
+        loginErrorText = 'Неправильный логин или пароль';
+        passwordErrorText = 'Неправильный логин или пароль';
+      });
     });
   }
 }
