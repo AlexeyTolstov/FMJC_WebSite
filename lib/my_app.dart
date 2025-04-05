@@ -7,6 +7,7 @@ import 'package:maps_application/pages/auth/signin_page.dart';
 import 'package:maps_application/pages/auth/signin_vk_page.dart';
 import 'package:maps_application/pages/main_page.dart';
 import 'package:maps_application/pages/auth/signup_page.dart';
+import 'package:maps_application/pages/suggestion_id_page.dart';
 import 'package:maps_application/pages/suggestion_view_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -28,6 +29,15 @@ class MyApp extends StatelessWidget {
         '/add-route': (context) => const AddRoutePage(),
         '/add-suggestion': (context) => const AddSuggestionPage(),
         '/suggestion-view': (context) => const SuggestionViewPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name != null &&
+            settings.name!.startsWith('/suggestion-view/')) {
+          final id = settings.name!.split('/').last;
+          return MaterialPageRoute(
+              builder: (context) => SuggestionIdPage(id: id));
+        }
+        return null;
       },
     );
   }

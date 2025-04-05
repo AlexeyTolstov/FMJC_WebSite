@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/data/suggestion.dart';
 
@@ -12,6 +10,18 @@ List<Suggestion> allSuggestions = [
         'Необходимо организовать пункты раздельного сбора мусора в каждом районе.',
     category: suggestionCategories[1],
     author_id: 34,
+  ),
+  Suggestion(
+    name: 'Автобус',
+    description:
+        'Нет автобусов проходящих через точки A, B, C, D. Чтобы попасть из точки A в точку C нужно сделать пересадку на двух автобусах. ',
+    author_id: 35,
+    route: [
+      LatLng(52.504305, 85.136879),
+      LatLng(52.523848, 85.183107),
+      LatLng(52.537533, 85.225489),
+      LatLng(52.549627, 85.218869),
+    ],
   ),
   Suggestion(
     name: 'Чистый воздух',

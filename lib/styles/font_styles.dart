@@ -65,3 +65,32 @@ abstract class FileUploadTextStyles {
     fontSize: 12,
   );
 }
+
+abstract class SuggestionItemTextStyles {
+  static const TextStyle title = TextStyle(
+    color: Colors.black,
+    fontSize: 17,
+  );
+
+  static const TextStyle description = TextStyle(
+    color: Colors.black,
+    fontSize: 15,
+  );
+
+  static const TextStyle score = TextStyle(
+    color: Colors.black,
+    fontSize: 13,
+  );
+}
+
+abstract class SuggestionPageTextStyles {
+  static const TextStyle header = TextStyle(
+    color: Colors.black,
+    fontSize: 20,
+  );
+
+  static const TextStyle description = TextStyle(
+    color: Colors.black,
+    fontSize: 15,
+  );
+}

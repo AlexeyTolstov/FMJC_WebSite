@@ -24,6 +24,7 @@ class Suggestion {
 
   LatLng? coords;
   String? category;
+  List<LatLng>? route;
 
   Suggestion({
     required this.name,
@@ -31,12 +32,13 @@ class Suggestion {
     required this.author_id,
     this.coords,
     this.category,
+    this.route,
   }) {
     id = suggestionId++;
   }
 
   @override
   String toString() {
-    return '$name: \n$description\n$coords\n$category';
+    return '$name: \n$description\n';
   }
 }

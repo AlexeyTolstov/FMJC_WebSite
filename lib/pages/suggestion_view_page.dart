@@ -54,7 +54,7 @@ class _FiltersSearchBarState extends State<FiltersSearchBar> {
   Widget build(BuildContext context) {
     return Container(
       width: 400,
-      height: 275,
+      height: 300,
       padding: const EdgeInsets.all(10),
       color: Colors.white,
       child: Column(
@@ -115,6 +115,19 @@ class _FiltersSearchBarState extends State<FiltersSearchBar> {
           SizedBox(height: 10),
           Align(
             alignment: Alignment.bottomRight,
+            child: TextButton(
+              onPressed: () {},
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [Icon(Icons.person), Text('Мои предложения')],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
             child: SizedBox(
               width: 200,
               child: TextField(
@@ -123,7 +136,10 @@ class _FiltersSearchBarState extends State<FiltersSearchBar> {
                 decoration: InputDecoration(
                   prefixIcon: IconButton(
                     icon: Icon(Icons.search),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                          context, '/suggestion-view/${controller.text}');
+                    },
                   ),
                   hintText: 'ID предложения',
                   border: OutlineInputBorder(
