@@ -1,4 +1,3 @@
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:latlong2/latlong.dart';
 
 List<String> suggestionCategories = [
@@ -17,8 +16,8 @@ List<String> suggestionCategories = [
 int suggestionId = 0;
 
 class Suggestion {
-  late int id;
-  int author_id;
+  final int id;
+  String author_id;
   String name;
   String description;
 
@@ -26,16 +25,20 @@ class Suggestion {
   String? category;
   List<LatLng>? route;
 
+  int? likes;
+  int? dislikes;
+
   Suggestion({
+    required this.id,
     required this.name,
     required this.description,
     required this.author_id,
+    this.likes,
+    this.dislikes,
     this.coords,
     this.category,
     this.route,
-  }) {
-    id = suggestionId++;
-  }
+  });
 
   @override
   String toString() {

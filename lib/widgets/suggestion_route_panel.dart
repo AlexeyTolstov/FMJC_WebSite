@@ -3,8 +3,10 @@ import 'package:maps_application/styles/button_styles.dart';
 
 class SuggestionRoutePanel extends StatefulWidget {
   final VoidCallback onClose;
+  final void Function(String, String) onSend;
 
-  SuggestionRoutePanel({super.key, required this.onClose});
+  SuggestionRoutePanel(
+      {super.key, required this.onClose, required this.onSend});
 
   @override
   State<SuggestionRoutePanel> createState() => _SuggestionRoutePanelState();
@@ -87,7 +89,10 @@ class _SuggestionRoutePanelState extends State<SuggestionRoutePanel> {
 
                                   return;
                                 }
-                                Navigator.pop(context);
+                                widget.onSend(
+                                  nameController.text,
+                                  descriptionController.text,
+                                );
                               },
                               child: Text('Сохранить'),
                             ),

@@ -12,6 +12,6 @@ Future<String> fetchAddress(LatLng latLng) async {
   print(
       'https://nominatim.openstreetmap.org/reverse?lat=${latLng.latitude.toStringAsFixed(3)}&lon=${latLng.longitude.toStringAsFixed(3)}&format=jsonv2');
 
-  final body = jsonDecode(response.body);
+  final body = jsonDecode(utf8.decode(response.bodyBytes));
   return body['address']['road'];
 }

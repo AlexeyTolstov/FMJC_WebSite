@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:maps_application/api_client.dart';
+import 'package:maps_application/api/suggestion/get_suggestion_list.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:maps_application/styles/font_styles.dart';
+import 'package:maps_application/user_service.dart';
 import 'package:maps_application/widgets/suggestion_item.dart';
 
 class SuggestionViewPage extends StatefulWidget {
@@ -12,6 +13,21 @@ class SuggestionViewPage extends StatefulWidget {
 }
 
 class _SuggestionViewPageState extends State<SuggestionViewPage> {
+  List<Suggestion>? _listSuggestion;
+
+  @override
+  void initState() {
+    get_all_suggestion().then((v) {
+      setState(() {
+        _listSuggestion = v;
+      });
+    });
+
+    super.initState();
+  }
+
+  void onSearch(bool isPoint, bool isRoute, bool isProposal) {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,10 +41,33 @@ class _SuggestionViewPageState extends State<SuggestionViewPage> {
             SizedBox(
               width: double.infinity,
             ),
-            FiltersSearchBar(),
-            ...allSuggestions.map((Suggestion s) => SuggestionItem(
-                  suggestion: s,
-                )),
+            FiltersSearchBar(
+              onSearch: (
+                bool isPoint,
+                bool isRoute,
+                bool isProposal,
+                bool isUser,
+              ) {
+                get_all_suggestion(
+                  id: (isUser) ? int.parse(UserService().userId!) : null,
+                  isPoint: isPoint,
+                  isRoute: isRoute,
+                  isProposal: isProposal,
+                ).then((v) {
+                  setState(() {
+                    _listSuggestion = v;
+                  });
+                });
+              },
+            ),
+            if (_listSuggestion == null)
+              Text('Идет загрузка предложений')
+            else if (_listSuggestion!.length == 0)
+              Text('Предложений нет')
+            else
+              ..._listSuggestion!.map((Suggestion s) => SuggestionItem(
+                    suggestion: s,
+                  )),
           ],
         ),
       ),
@@ -37,8 +76,8 @@ class _SuggestionViewPageState extends State<SuggestionViewPage> {
 }
 
 class FiltersSearchBar extends StatefulWidget {
-  const FiltersSearchBar({super.key});
-
+  const FiltersSearchBar({super.key, required this.onSearch});
+  final Function(bool, bool, bool, bool) onSearch;
   @override
   State<FiltersSearchBar> createState() => _FiltersSearchBarState();
 }
@@ -49,6 +88,7 @@ class _FiltersSearchBarState extends State<FiltersSearchBar> {
   bool a = false;
   bool b = false;
   bool c = false;
+  bool d = false;
 
   @override
   Widget build(BuildContext context) {
@@ -109,14 +149,27 @@ class _FiltersSearchBarState extends State<FiltersSearchBar> {
           ),
           SizedBox(height: 20),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              widget.onSearch(a, b, c, d);
+            },
             child: Text('Применить фильтры'),
           ),
           SizedBox(height: 10),
           Align(
             alignment: Alignment.bottomRight,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  d = !d;
+                });
+              },
+              style: ButtonStyle(
+                  backgroundColor: (!d)
+                      ? WidgetStatePropertyAll(Colors.white)
+                      : WidgetStatePropertyAll(Colors.blue),
+                  foregroundColor: (!d)
+                      ? WidgetStatePropertyAll(Colors.blue)
+                      : WidgetStatePropertyAll(Colors.white)),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [Icon(Icons.person), Text('Мои предложения')],

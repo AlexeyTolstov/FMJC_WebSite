@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:maps_application/api/suggestion/add_suggestion.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:maps_application/styles/button_styles.dart';
 import 'package:maps_application/styles/font_styles.dart';
@@ -171,7 +172,11 @@ class _AddSuggestionPageState extends State<AddSuggestionPage> {
                           });
                           if (nameController.text == '' ||
                               descriptionController.text == '') return;
-
+                          add_proposal(
+                            name: nameController.text,
+                            description: descriptionController.text,
+                            category: dropdownvalue,
+                          );
                           Navigator.pop(context);
                         },
                         child: Text('Сохранить'),

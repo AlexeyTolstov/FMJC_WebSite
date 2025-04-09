@@ -8,38 +8,40 @@ Future<void> sign_in({
   required String login,
   required String password,
 }) async {
-  UserService().userId = '1234';
-
-  /*
-  final response = await http.get(
-    Uri.parse(
-        'https://fmjc-biysk-pc.cloudpub.ru/user/sign-in?login=123456&password=123456'),
-    headers: {"Content-Type": "application/json; charset=utf-8"},
+  final response = await http.post(
+    Uri.parse('http://j-cupfirst-sleep.amvera.io/user/sign-in'),
+    body: jsonEncode({
+      'login': login,
+      'password': password,
+    }),
+    headers: {'Content-Type': 'application/json'},
   );
 
-  // final response = await http.post(
-  //   Uri.parse('https://fmjc-biysk-pc.cloudpub.ru/user/sign-in'),
-  //   body: jsonEncode(
-  //     {
-  //       'login': '123456',
-  //       'password': '123456',
-  //     },
-  //   ),
-  //   headers: {"Content-Type": "application/json"},
-  // );
-
-  if (response.statusCode == 404) {
+  if (response.statusCode == 400) {
     throw UserNotFound();
   }
 
-  final data = jsonDecode(response.body);
-  print(data);
-  */
+  final data = jsonDecode(utf8.decode(response.bodyBytes));
+  UserService().userId = data['token'];
 }
 
 Future<void> sign_up({
   required String login,
   required String password,
 }) async {
-  UserService().userId = '1234';
+  final response = await http.post(
+    Uri.parse('http://j-cupfirst-sleep.amvera.io/user/sign-up'),
+    body: jsonEncode({
+      'login': login,
+      'password': password,
+    }),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 400) {
+    throw LoginAlreadyRegistered();
+  }
+
+  final data = jsonDecode(utf8.decode(response.bodyBytes));
+  UserService().userId = data['token'];
 }

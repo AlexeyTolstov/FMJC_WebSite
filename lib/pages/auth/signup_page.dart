@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:maps_application/api/auth.dart';
 import 'package:maps_application/styles/button_styles.dart';
 import 'package:maps_application/styles/font_styles.dart';
 import 'package:maps_application/styles/images.dart';
 import 'package:maps_application/widgets/auth/gosuslugi_button.dart';
-import 'package:maps_application/api_client.dart';
 import 'package:maps_application/widgets/auth/ok_button.dart';
 import 'package:maps_application/widgets/auth/vk_button.dart';
 import 'package:maps_application/widgets/signin_password_input.dart';
@@ -162,22 +162,37 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void signUpValidation() {
-    if (loginTextController.text.length >= 1 &&
-        passwordTextController.text.length >= 1) {
-      createNewUser(
-        login: loginTextController.text,
-        password: passwordTextController.text,
-      );
+    setState(() {
+      if (loginTextController.text.length < 3) {
+        loginErrorText = 'Логин слишком короткий';
+      } else {
+        loginErrorText = null;
+      }
+      if (passwordTextController.text.length < 3) {
+        passwordErrorText = 'Пароль слишком короткий';
+      } else {
+        passwordErrorText = null;
+      }
+    });
+    if (loginTextController.text.length < 3 ||
+        passwordTextController.text.length < 3) {
+      return;
+    }
+
+    sign_up(
+            login: loginTextController.text,
+            password: passwordTextController.text)
+        .then((v) {
       setState(() {
         loginErrorText = null;
         passwordErrorText = null;
       });
       Navigator.pushReplacementNamed(context, '/main_page');
-    } else {
+    }).onError((e, v) {
       setState(() {
-        loginErrorText = 'Неправильный логин или пароль';
-        passwordErrorText = 'Неправильный логин или пароль';
+        loginErrorText = 'Логин уже занят';
+        passwordErrorText = '';
       });
-    }
+    });
   }
 }

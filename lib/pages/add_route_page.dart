@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:maps_application/api/fetch_address.dart';
 import 'package:maps_application/api/fetch_route.dart';
 import 'package:maps_application/api/search_places.dart';
+import 'package:maps_application/api/suggestion/add_suggestion.dart';
 import 'package:maps_application/styles/font_styles.dart';
 import 'package:maps_application/user_service.dart';
 import 'package:maps_application/widgets/route_item.dart';
@@ -197,6 +198,16 @@ class _AddRoutePageState extends State<AddRoutePage> {
                               ),
                             if (isOpened)
                               SuggestionRoutePanel(
+                                onSend: (String name, String description) {
+                                  add_route(
+                                    name: name,
+                                    description: description,
+                                    route:
+                                        listPoint.map((v) => v.latLng).toList(),
+                                  ).then((v) {
+                                    Navigator.pop(context);
+                                  });
+                                },
                                 onClose: () {
                                   setState(() {
                                     isOpened = false;
@@ -253,6 +264,8 @@ class PanelPoints extends StatefulWidget {
 }
 
 class _PanelPointsState extends State<PanelPoints> {
+  String? errorText;
+
   void onTapDelete(int index) {
     setState(() {
       widget.listPoint.removeAt(index);
@@ -289,6 +302,16 @@ class _PanelPointsState extends State<PanelPoints> {
             'Точки для маршрута',
             style: MainTextStyles.title,
           ),
+          Container(
+            width: 400,
+            height: 50,
+            child: (errorText != null)
+                ? Text(
+                    errorText!,
+                    style: TextStyle(color: Colors.red),
+                  )
+                : null,
+          ),
           Expanded(
             child: ReorderableListView.builder(
               buildDefaultDragHandles: false,
@@ -324,7 +347,15 @@ class _PanelPointsState extends State<PanelPoints> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: widget.onSave,
+                  onPressed: () {
+                    if (widget.listPoint.length <= 1) {
+                      errorText = 'Для маршрута необходимо больше 2х точек';
+                      setState(() {});
+                      return;
+                    }
+
+                    widget.onSave();
+                  },
                   child: Text('Завершить'),
                 ),
                 SizedBox(width: 20),
@@ -362,6 +393,7 @@ class PanelPointsBottom extends StatefulWidget {
 }
 
 class _PanelPointsBottomState extends State<PanelPointsBottom> {
+  String? errorText;
   void onTapDelete(int index) {
     setState(() {
       widget.listPoint.removeAt(index);
@@ -405,7 +437,15 @@ class _PanelPointsBottomState extends State<PanelPointsBottom> {
                           child: Text('Добавить маршрут',
                               style: MainTextStyles.header)),
                       IconButton(
-                        onPressed: widget.onSave,
+                        onPressed: () {
+                          if (widget.listPoint.length <= 1) {
+                            errorText =
+                                'Для маршрута необходимо больше 2х точек';
+                            setState(() {});
+                            return;
+                          }
+                          widget.onSave();
+                        },
                         icon: Container(
                           child: Icon(
                             Icons.check,
@@ -441,9 +481,14 @@ class _PanelPointsBottomState extends State<PanelPointsBottom> {
                   ),
                   Text('Точки для маршрута', style: MainTextStyles.title),
                   Container(
-                    child: Column(
-                      children: [],
-                    ),
+                    width: 400,
+                    height: 50,
+                    child: (errorText != null)
+                        ? Text(
+                            errorText!,
+                            style: TextStyle(color: Colors.red),
+                          )
+                        : null,
                   ),
                   for (int i = 0; i < widget.listPoint.length; i++)
                     ListTile(

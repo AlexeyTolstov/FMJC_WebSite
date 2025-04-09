@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/api/fetch_route.dart';
-import 'package:maps_application/api_client.dart';
+import 'package:maps_application/api/suggestion/estimation.dart';
+import 'package:maps_application/api/suggestion/get_suggestion_id.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:maps_application/styles/font_styles.dart';
-
-Suggestion? getSuggestionById(String id) {
-  for (final s in allSuggestions) {
-    if (s.id == int.parse(id)) {
-      return s;
-    }
-  }
-  return null;
-}
 
 class SuggestionIdPage extends StatefulWidget {
   final String id;
@@ -26,12 +17,32 @@ class SuggestionIdPage extends StatefulWidget {
 }
 
 class _SuggestionIdPageState extends State<SuggestionIdPage> {
-  late final Suggestion? _suggestion;
+  Suggestion? _suggestion;
   final controller = MapController();
+
+  int likes = 0;
+  int dislikes = 0;
+
+  int userEstimation = 0;
+  bool isReady = false;
 
   @override
   void initState() {
-    _suggestion = getSuggestionById(widget.id);
+    get_suggestion_by_id(id: int.tryParse(widget.id)).then((v) {
+      setState(() {
+        _suggestion = v;
+        likes = _suggestion!.likes ?? -1;
+        dislikes = _suggestion!.dislikes ?? -1;
+        isReady = true;
+      });
+
+      get_user_estimation(_suggestion!.id).then((v) {
+        setState(() {
+          userEstimation = v;
+        });
+      });
+    });
+
     super.initState();
   }
 
@@ -47,21 +58,107 @@ class _SuggestionIdPageState extends State<SuggestionIdPage> {
       appBar: AppBar(),
       body: Column(
         children: [
-          Text(
-            _suggestion.name,
-            style: SuggestionPageTextStyles.header,
-          ),
-          Text(
-            _suggestion.description,
-            style: SuggestionPageTextStyles.description,
-          ),
-          Text('Author ID: ${_suggestion.author_id}'),
-          if (_suggestion.coords != null) PointMap(suggestion: _suggestion),
-          if (_suggestion.route != null)
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: RouteMap(routePoints: _suggestion.route!),
+          if (isReady && _suggestion == null)
+            Text('Упс... Ничего не найдено')
+          else if (isReady && _suggestion != null)
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    '${_suggestion!.name}      ID: ${_suggestion!.id}',
+                    style: SuggestionPageTextStyles.header,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    _suggestion!.description,
+                    style: SuggestionPageTextStyles.description,
+                  ),
+                  SizedBox(height: 10),
+                  Text('Author ID: ${_suggestion!.author_id}'),
+                  SizedBox(height: 10),
+                  if (_suggestion!.coords != null)
+                    PointMap(suggestion: _suggestion!),
+                  if (_suggestion!.route != null)
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: RouteMap(routePoints: _suggestion!.route!),
+                    ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              if (userEstimation == 1)
+                                userEstimation = 0;
+                              else
+                                userEstimation = 1;
+                              set_estimation(
+                                id: _suggestion!.id,
+                                estimation: userEstimation,
+                              ).then((v) {
+                                get_suggestion_by_id(id: _suggestion!.id)
+                                    .then((v) {
+                                  if (_suggestion!.id != -1)
+                                    setState(() {
+                                      _suggestion = v!;
+                                      likes = _suggestion!.likes ?? -1;
+                                      dislikes = _suggestion!.dislikes ?? -1;
+                                    });
+                                });
+                              });
+                            },
+                            icon: (userEstimation != 1)
+                                ? Icon(Icons.thumb_up_outlined)
+                                : Icon(Icons.thumb_up_alt),
+                          ),
+                          Text(likes.toString()),
+                        ],
+                      ),
+                      SizedBox(width: 30),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (userEstimation == -1)
+                                  userEstimation = 0;
+                                else
+                                  userEstimation = -1;
+
+                                set_estimation(
+                                  id: _suggestion!.id,
+                                  estimation: userEstimation,
+                                ).then((v) {
+                                  get_suggestion_by_id(id: _suggestion!.id)
+                                      .then((v) {
+                                    if (_suggestion!.id != -1)
+                                      setState(() {
+                                        _suggestion = v!;
+                                        likes = _suggestion!.likes ?? -1;
+                                        dislikes = _suggestion!.dislikes ?? -1;
+                                      });
+                                  });
+                                });
+                              });
+                            },
+                            icon: (userEstimation != -1)
+                                ? Icon(Icons.thumb_down_outlined)
+                                : Icon(Icons.thumb_down_alt),
+                          ),
+                          Text(dislikes.toString()),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          if (!isReady) Text('Ищем предложение')
         ],
       ),
     );
@@ -76,8 +173,8 @@ class PointMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 500,
-      height: 500,
+      width: 200,
+      height: 200,
       child: FlutterMap(
         mapController: controller,
         options: MapOptions(
@@ -147,8 +244,8 @@ class _RouteMapState extends State<RouteMap> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
-      height: 300,
+      width: 200,
+      height: 200,
       child: FlutterMap(
         mapController: controller,
         options: MapOptions(

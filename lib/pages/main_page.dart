@@ -4,7 +4,8 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_application/api/poi.dart';
 import 'package:maps_application/api/search_places.dart';
-import 'package:maps_application/api_client.dart';
+import 'package:maps_application/api/suggestion/get_suggestion_id.dart';
+import 'package:maps_application/api/suggestion/get_suggestion_list.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/user_service.dart';
@@ -27,8 +28,6 @@ double distanceBetweenPoints(LatLng latLng1, LatLng latLng2) {
   return sqrt(dx * dx + dy * dy);
 }
 
-int myId = 0;
-
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -39,6 +38,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
+  List<Suggestion> _pointList = [];
 
   late final Tutorial _tutorial;
 
@@ -46,8 +46,6 @@ class _MainPageState extends State<MainPage> {
   Suggestion? openedSuggestion;
 
   bool isReady = false;
-
-  List<POIData> _listPOI = [];
 
   bool isOpened = false;
   Suggestion? tempSuggestion;
@@ -95,6 +93,11 @@ class _MainPageState extends State<MainPage> {
     getPosition().whenComplete(() {
       // joke(latLng: _currentLocation ?? LatLng(0, 0));
     });
+    get_list_point().then((List<Suggestion> suggestionList) {
+      setState(() {
+        _pointList = suggestionList;
+      });
+    });
     // _tutorial = Tutorial(context);
     // Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
@@ -110,11 +113,13 @@ class _MainPageState extends State<MainPage> {
     if (isReady && _mapController.camera.zoom >= 10) {
       isOpened = true;
       tempSuggestion = Suggestion(
+        id: -1,
         name: '',
         description: '',
-        author_id: myId,
+        author_id: UserService().userId!,
         coords: latLng,
       );
+
       setState(() {});
     }
   }
@@ -127,25 +132,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isReady && false) {
-      // РАЗБЛОКИРОВАТЬ КОГДА БУДЕТ ГОТОВО!!!!
-      if (_mapController.camera.zoom >= 12) {
-        if (lastCenter == null) {
-          lastCenter = _mapController.camera.center;
-        } else {
-          if (distanceBetweenPoints(lastCenter!, _mapController.camera.center) >
-              5000) {
-            print('Update');
-            fetchPoi(_mapController.camera.center, 10000).then((e) {
-              setState(() {
-                _listPOI = e;
-              });
-            });
-            lastCenter = _mapController.camera.center;
-          }
-        }
-      }
-    }
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: LayoutBuilder(builder: (context, constraints) {
@@ -166,7 +152,6 @@ class _MainPageState extends State<MainPage> {
                             onMapEvent: (MapEvent mapEvent) {
                               if (mapEvent.source ==
                                   MapEventSource.scrollWheel) {
-                                print(mapEvent.camera.zoom);
                                 setState(() {});
                               }
                             },
@@ -197,7 +182,7 @@ class _MainPageState extends State<MainPage> {
                               MarkerLayer(
                                 markers: [
                                   if (_mapController.camera.zoom >= 10)
-                                    ...getListPoints().map((s) => Marker(
+                                    ..._pointList.map((s) => Marker(
                                           width: 50,
                                           height: 50,
                                           point: s.coords!,
@@ -208,25 +193,13 @@ class _MainPageState extends State<MainPage> {
                                               size: 50,
                                             ),
                                             onTap: () {
-                                              isOpened = true;
-                                              tempSuggestion = s;
-                                              setState(() {});
-                                            },
-                                          ),
-                                        )),
-                                  if (_mapController.camera.zoom >= 14)
-                                    ..._listPOI.map((p) => Marker(
-                                          width: 30,
-                                          height: 30,
-                                          point: p.latLng,
-                                          child: GestureDetector(
-                                            child: Icon(
-                                              Icons.circle,
-                                              color: Colors.blue,
-                                              size: 30,
-                                            ),
-                                            onTap: () {
-                                              print(p.tags);
+                                              get_point_by_id(id: s.id)
+                                                  .then((v) {
+                                                setState(() {
+                                                  isOpened = true;
+                                                  tempSuggestion = v;
+                                                });
+                                              });
                                             },
                                           ),
                                         )),
@@ -268,15 +241,21 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                           ),
-                        if (isOpened)
+                        if (isOpened && tempSuggestion != null)
                           SuggestionPointPanel(
+                            isEnable: tempSuggestion!.id == -1,
                             suggestion: tempSuggestion!,
-                            isEnable: tempSuggestion!.author_id == myId,
                             onClose: () {
                               setState(
                                 () {
                                   isOpened = false;
                                   tempSuggestion = null;
+
+                                  get_list_point().then((v) {
+                                    setState(() {
+                                      _pointList = v;
+                                    });
+                                  });
                                 },
                               );
                             },

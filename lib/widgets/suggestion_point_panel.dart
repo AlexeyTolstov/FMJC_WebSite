@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:maps_application/api_client.dart';
+import 'package:maps_application/api/suggestion/add_suggestion.dart';
+import 'package:maps_application/api/suggestion/estimation.dart';
+import 'package:maps_application/api/suggestion/get_suggestion_id.dart';
 import 'package:maps_application/data/suggestion.dart';
-import 'package:maps_application/pages/main_page.dart';
 import 'package:maps_application/styles/button_styles.dart';
 
 class SuggestionPointPanel extends StatefulWidget {
-  final Suggestion suggestion;
+  Suggestion suggestion;
   final VoidCallback onClose;
   final bool isEnable;
 
-  const SuggestionPointPanel({
+  SuggestionPointPanel({
     super.key,
     required this.suggestion,
     required this.onClose,
@@ -24,8 +25,10 @@ class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
-  final int likes = 10;
-  final int dislikes = 1;
+  int likes = 0;
+  int dislikes = 0;
+
+  int userEstimation = 0;
 
   String? errorTextName;
   String? errorTextDescription;
@@ -35,10 +38,21 @@ class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
     super.initState();
     nameController.text = widget.suggestion.name;
     descriptionController.text = widget.suggestion.description;
+    likes = widget.suggestion.likes ?? -1;
+    dislikes = widget.suggestion.dislikes ?? -1;
+
+    get_user_estimation(widget.suggestion.id).then((v) {
+      setState(() {
+        userEstimation = v;
+        likes = widget.suggestion.likes ?? -1;
+        dislikes = widget.suggestion.dislikes ?? -1;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('$likes $dislikes');
     return Stack(
       children: [
         GestureDetector(
@@ -97,8 +111,31 @@ class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
                           Row(
                             children: [
                               IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.thumb_up_outlined),
+                                onPressed: () {
+                                  if (userEstimation == 1)
+                                    userEstimation = 0;
+                                  else
+                                    userEstimation = 1;
+                                  set_estimation(
+                                    id: widget.suggestion.id,
+                                    estimation: userEstimation,
+                                  ).then((v) {
+                                    get_suggestion_by_id(
+                                            id: widget.suggestion.id)
+                                        .then((v) {
+                                      if (widget.suggestion.id != -1)
+                                        setState(() {
+                                          widget.suggestion = v!;
+                                          likes = widget.suggestion.likes ?? -1;
+                                          dislikes =
+                                              widget.suggestion.dislikes ?? -1;
+                                        });
+                                    });
+                                  });
+                                },
+                                icon: (userEstimation != 1)
+                                    ? Icon(Icons.thumb_up_outlined)
+                                    : Icon(Icons.thumb_up_alt),
                               ),
                               Text(likes.toString()),
                             ],
@@ -107,8 +144,36 @@ class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
                           Row(
                             children: [
                               IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.thumb_down_outlined),
+                                onPressed: () {
+                                  setState(() {
+                                    if (userEstimation == -1)
+                                      userEstimation = 0;
+                                    else
+                                      userEstimation = -1;
+
+                                    set_estimation(
+                                      id: widget.suggestion.id,
+                                      estimation: userEstimation,
+                                    ).then((v) {
+                                      get_suggestion_by_id(
+                                              id: widget.suggestion.id)
+                                          .then((v) {
+                                        if (widget.suggestion.id != -1)
+                                          setState(() {
+                                            widget.suggestion = v!;
+                                            likes =
+                                                widget.suggestion.likes ?? -1;
+                                            dislikes =
+                                                widget.suggestion.dislikes ??
+                                                    -1;
+                                          });
+                                      });
+                                    });
+                                  });
+                                },
+                                icon: (userEstimation != -1)
+                                    ? Icon(Icons.thumb_down_outlined)
+                                    : Icon(Icons.thumb_down_alt),
                               ),
                               Text(dislikes.toString()),
                             ],
@@ -142,21 +207,13 @@ class _SuggestionPointPanelState extends State<SuggestionPointPanel> {
                                     return;
                                   }
 
-                                  if (isHaveId(widget.suggestion.id)) {
-                                    editSuggestion(
-                                      widget.suggestion.id,
+                                  if (widget.suggestion.id == -1)
+                                    add_point(
                                       name: nameController.text,
                                       description: descriptionController.text,
-                                    );
-                                  } else {
-                                    addSuggestion(Suggestion(
-                                      name: nameController.text,
-                                      description: descriptionController.text,
-                                      author_id: myId,
-                                      coords: widget.suggestion.coords,
-                                      category: widget.suggestion.category,
-                                    ));
-                                  }
+                                      coord: widget.suggestion.coords!,
+                                    ).then((v) {});
+
                                   widget.onClose();
                                 },
                                 child: Text('Сохранить'),

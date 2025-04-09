@@ -49,7 +49,7 @@ class SuggestionItem extends StatelessWidget {
                         children: [
                           Icon(Icons.thumb_up_outlined),
                           Text(
-                            ' 10',
+                            ' ${suggestion.likes ?? 0}',
                             style: SuggestionItemTextStyles.score,
                           ),
                         ],
@@ -59,7 +59,7 @@ class SuggestionItem extends StatelessWidget {
                         children: [
                           Icon(Icons.thumb_down_outlined),
                           Text(
-                            ' 12',
+                            ' ${suggestion.dislikes ?? 0}',
                             style: SuggestionItemTextStyles.score,
                           ),
                         ],

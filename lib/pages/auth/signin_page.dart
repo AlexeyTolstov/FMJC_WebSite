@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maps_application/api/auth.dart';
-// import 'package:maps_application/api/ping.dart';
 import 'package:maps_application/styles/button_styles.dart';
 import 'package:maps_application/styles/font_styles.dart';
 import 'package:maps_application/styles/images.dart';
 import 'package:maps_application/widgets/auth/gosuslugi_button.dart';
-import 'package:maps_application/api_client.dart';
 import 'package:maps_application/widgets/auth/ok_button.dart';
 import 'package:maps_application/widgets/auth/vk_button.dart';
 import 'package:maps_application/widgets/signin_password_input.dart';
@@ -166,17 +164,19 @@ class _SignInPageState extends State<SignInPage> {
     sign_in(
             login: loginTextController.text,
             password: passwordTextController.text)
-        .whenComplete(() {
+        .then((v) {
       setState(() {
         loginErrorText = null;
         passwordErrorText = null;
       });
+
       Navigator.pushReplacementNamed(context, '/main_page');
     }).onError((error, value) {
       setState(() {
         loginErrorText = 'Неправильный логин или пароль';
         passwordErrorText = 'Неправильный логин или пароль';
       });
+      print(error);
     });
   }
 }
