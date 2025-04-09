@@ -10,7 +10,7 @@ Future<void> add_proposal({
   required String category,
 }) async {
   final response = await http.post(
-    Uri.parse('http://j-cupfirst-sleep.amvera.io/proposal/add_proposal'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/proposal/add_proposal'),
     body: jsonEncode({
       "name": name,
       "description": description,
@@ -30,7 +30,7 @@ Future<void> add_point({
 }) async {
   print('add point');
   final response = await http.post(
-    Uri.parse('http://j-cupfirst-sleep.amvera.io/point/add_point'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/point/add_point'),
     body: jsonEncode({
       "name": name,
       "description": description,
@@ -54,7 +54,7 @@ Future<void> add_route({
   print(
       route.map((LatLng coord) => [coord.latitude, coord.longitude]).toList());
   final response = await http.post(
-    Uri.parse('http://j-cupfirst-sleep.amvera.io/route/add_route'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/route/add_route'),
     body: jsonEncode({
       "name": name,
       "description": description,

@@ -7,7 +7,7 @@ Future<Suggestion> get_point_by_id({
   required int id,
 }) async {
   final response = await http.get(
-    Uri.parse('http://j-cupfirst-sleep.amvera.io/point/$id'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/point/$id'),
     headers: {'Content-Type': 'application/json'},
   );
   final body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -29,7 +29,7 @@ Future<Suggestion?> get_suggestion_by_id({
   if (id == null) return null;
 
   final response = await http.get(
-    Uri.parse('http://j-cupfirst-sleep.amvera.io/point/$id'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/point/$id'),
     headers: {'Content-Type': 'application/json'},
   );
   final body = jsonDecode(utf8.decode(response.bodyBytes));
