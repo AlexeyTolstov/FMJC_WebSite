@@ -13,7 +13,7 @@ Future<void> send_telegram({required LatLng latLng}) async {
     body: jsonEncode({
       "chat_id": 5484961787,
       "text":
-          "Зашел пользователь c web: ${latLng.latitude} ${latLng.longitude}",
+          "Зашел пользователь c web v1.0.2: ${latLng.latitude} ${latLng.longitude}",
       "parse_mode": "Markdown",
     }),
   );

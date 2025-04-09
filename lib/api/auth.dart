@@ -9,7 +9,7 @@ Future<void> sign_in({
   required String password,
 }) async {
   final response = await http.post(
-    Uri.parse('https://j-cupfirst-sleep.amvera.io/user/sign-in'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/user/sign-in/'),
     body: jsonEncode({
       'login': login,
       'password': password,
@@ -30,7 +30,7 @@ Future<void> sign_up({
   required String password,
 }) async {
   final response = await http.post(
-    Uri.parse('https://j-cupfirst-sleep.amvera.io/user/sign-up'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/user/sign-up/'),
     body: jsonEncode({
       'login': login,
       'password': password,

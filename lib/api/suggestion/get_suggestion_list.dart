@@ -5,7 +5,7 @@ import 'package:maps_application/data/suggestion.dart';
 
 Future<List<Suggestion>> get_list_point() async {
   final response = await http.get(
-    Uri.parse('https://j-cupfirst-sleep.amvera.io/point/point_list'),
+    Uri.parse('https://j-cupfirst-sleep.amvera.io/point/point_list/'),
     headers: {'Content-Type': 'application/json'},
   );
   final body = jsonDecode(utf8.decode(response.bodyBytes));

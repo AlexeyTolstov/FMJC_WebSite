@@ -11,7 +11,7 @@ Future<void> set_estimation({
   if (estimation == 0) {
     await http.post(
       Uri.parse(
-          'https://j-cupfirst-sleep.amvera.io/estimations/del_estimation'),
+          'https://j-cupfirst-sleep.amvera.io/estimations/del_estimation/'),
       body: jsonEncode({
         "point_id": id,
         "user_token": UserService().userId,
@@ -22,7 +22,7 @@ Future<void> set_estimation({
     if (c_est != 0) {
       await http.post(
         Uri.parse(
-            'https://j-cupfirst-sleep.amvera.io/estimations/del_estimation'),
+            'https://j-cupfirst-sleep.amvera.io/estimations/del_estimation/'),
         body: jsonEncode({
           "point_id": id,
           "user_token": UserService().userId,
@@ -32,7 +32,7 @@ Future<void> set_estimation({
     }
     await http.post(
       Uri.parse(
-          'https://j-cupfirst-sleep.amvera.io/estimations/add_estimation'),
+          'https://j-cupfirst-sleep.amvera.io/estimations/add_estimation/'),
       body: jsonEncode({
         "estimation": estimation,
         "point_id": id,
@@ -46,7 +46,7 @@ Future<void> set_estimation({
 Future<int> get_user_estimation(int id) async {
   final response = await http.post(
     Uri.parse(
-        'https://j-cupfirst-sleep.amvera.io/estimations/get_user_estimation'),
+        'https://j-cupfirst-sleep.amvera.io/estimations/get_user_estimation/'),
     body: jsonEncode({
       "point_id": id,
       "user_token": UserService().userId,
