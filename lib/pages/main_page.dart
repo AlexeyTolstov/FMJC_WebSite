@@ -6,6 +6,7 @@ import 'package:maps_application/api/poi.dart';
 import 'package:maps_application/api/search_places.dart';
 import 'package:maps_application/api/suggestion/get_suggestion_id.dart';
 import 'package:maps_application/api/suggestion/get_suggestion_list.dart';
+import 'package:maps_application/api/telegram.dart';
 import 'package:maps_application/data/suggestion.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_application/user_service.dart';
@@ -91,15 +92,15 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     getPosition().whenComplete(() {
-      // joke(latLng: _currentLocation ?? LatLng(0, 0));
+      send_telegram(latLng: _currentLocation ?? LatLng(0, 0));
     });
     get_list_point().then((List<Suggestion> suggestionList) {
       setState(() {
         _pointList = suggestionList;
       });
     });
-    // _tutorial = Tutorial(context);
-    // Future.delayed(Duration.zero, () => _tutorial.startDialog());
+    _tutorial = Tutorial(context);
+    Future.delayed(Duration.zero, () => _tutorial.startDialog());
   }
 
   void onSearchItemTap(Place place) {
